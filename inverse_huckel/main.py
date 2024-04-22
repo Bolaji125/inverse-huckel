@@ -52,7 +52,7 @@ print("\nEigenvectors (each column represents a wavefunction):")
 print(wavefunctions)
 
 #workshop
-#question 1
+#question 1- calculate the MO energies 
 def allyl_radical_energy(alpha, beta):
     E1 = alpha + np.sqrt(2) * beta
     E2 = alpha
@@ -87,6 +87,70 @@ print("E_cyclopropenyl1:", E_cyclopropenyl[0])
 print("E_cyclopropenyl2:", E_cyclopropenyl[1])
 print("E_cyclopropenyl3:", E_cyclopropenyl[2])
 
-#question 4
+#question 4- calculate the total energies
+def allyl_total_energy(alpha, beta):
+    E1 = alpha + np.sqrt(2) * beta
+    E2 = alpha
+    return 2 * E1 + 1 * E2
+
+def cyclopropene_total_energy(alpha, beta):
+    E1 = alpha + 2* beta
+    E2 = alpha - beta
+    return 2 * E1 + 1 * E2
+# Constants for allyl radical and cyclopropene
+alpha = -1.0
+beta = -0.5
+
+# Calculate total energies
+allyl_energy = allyl_total_energy(alpha, beta)
+cyclopropene_energy = cyclopropene_total_energy(alpha, beta)
+
+# Determine which molecule is more stable
+if cyclopropene_energy < allyl_energy: #i think less than as lower energy is more stable
+    print("Cyclopropene is more stable.")
+else:
+    print("Allyl radical is more stable.")
+
+# Calculate energy difference
+energy_difference = cyclopropene_energy - allyl_energy
+print("Energy difference (ΔE) =", energy_difference)
+
+#tepe
+# Define functions to calculate TEPE for allyl radical
+def allyl_TEPE(alpha, beta):
+    E_neutral = alpha + 2 * np.sqrt(2) * beta
+    E_cation = alpha + np.sqrt(2) * beta
+    E_anion = alpha + np.sqrt(2) / 2 * beta
+    return E_neutral, E_cation, E_anion
+
+# Define functions to calculate TEPE for cyclopropene
+def cyclopropene_TEPE(alpha, beta):
+    E_neutral = alpha + beta
+    E_cation = alpha + 2 * beta
+    E_anion = alpha + 1 / 2 * beta
+    return E_neutral, E_cation, E_anion
+# Constants for allyl radical and cyclopropene
+alpha = -1.0
+beta = -0.5
+
+# Calculate TEPE for allyl radical
+allyl_TEPE_values = allyl_TEPE(alpha, beta)
+E_allyl_neutral, E_allyl_cation, E_allyl_anion = allyl_TEPE_values
+
+# Calculate TEPE for cyclopropene
+cyclopropene_TEPE_values = cyclopropene_TEPE(alpha, beta)
+E_cyclopropene_neutral, E_cyclopropene_cation, E_cyclopropene_anion = cyclopropene_TEPE_values
+
+# Determine which state is most stable for allyl radical
+if E_allyl_cation < E_allyl_neutral < E_allyl_anion:
+    print("For the allyl radical:")
+    print("The cation is the most stable.")
+    print("The neutral molecule is more stable than the anion.")
+
+# Determine which state is most stable for cyclopropene
+if E_cyclopropene_cation < E_cyclopropene_neutral < E_cyclopropene_anion:
+    print("\nFor cyclopropene:")
+    print("The cation is the most stable.")
+    print("The neutral molecule is more stable than the anion.")
 
 
