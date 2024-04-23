@@ -6,16 +6,16 @@ def calculate_distance(atom_i, atom_j): #calculates the Euclidean distance betwe
 def construct_hamiltonian(coordinates, alpha, beta, cutoff_distance): #constructs hamiltonian of a molecules based on its atomic coordinates
     n = len(coordinates) #coordinates is a numpy array that contains the coordinates of all atoms in the molecule
     H = np.zeros((n, n))
-    for i in range(n): #function iterates over all pairs of atoms
-        for j in range(i + 1, n):
-            distance_ij = calculate_distance(coordinates[i], coordinates[j]) #calling the function to calculate distance between atoms i and j
+    for i in range(n): #outer loop iterates over the indices of atoms in the molecule. i represents the index of the first atom.
+        for j in range(i + 1, n): #inner loop iteraes over the indices of atoms adjacent to the atom i. i+1 to avoid redundant calcs and ensure that each pair of atoms is considered only once. j represents the index of the second atom.
+            distance_ij = calculate_distance(coordinates[i], coordinates[j]) #calling the function to calculate distance between atoms i and j from the coordinates array.coordinates[i] is passed as the atom_i parameter, and coordinates[j] is passed as the atom_j parameter to the calculate_distance function.
             if distance_ij < cutoff_distance: #if distance between atoms i and j cooordinates are less than the cutoff distance
                 H[i, j] = beta #off diagonal elements sets to beta
                 H[j, i] = beta
     np.fill_diagonal(H, alpha) #diagonal elements filled with alpha
     return H #constructed hamiltonian is returned
 
-# Example usage:
+# Example use of code:
 benzene_coordinates = np.array([
     [-4.461121, 1.187057, -0.028519],
     [-3.066650, 1.263428, -0.002700],
@@ -33,13 +33,22 @@ H_benzene = construct_hamiltonian(benzene_coordinates, alpha, beta, cutoff_dista
 print("Hamiltonian matrix for benzene:")
 print(H_benzene)
 
+#Solve the eigenvalue problem
+energies, wavefunctions = np.linalg.eigh(H_benzene)
+
+# Print the results
+print("Eigenvalues (Energy levels):")
+print(energies)
+print("\nMolecular Orbitals (Eigenvectors):")
+print(wavefunctions)
+
 
 # def construct_hamiltonian(n, beta_values): #constructs hamiltonian matrix for cyclic pi system with n carbon atoms and a list of beta parameters
 #     H = np.zeros((n, n)) #output is hamiltonian matrix representing the system
 #     alpha = 0  # Energy of isolated atomic orbitals (set to 0 for simplicity)
 #     for i in range(n):
 #         H[i, i] = alpha
-#         for j in range(1, len(beta_values) + 1):
+#         for j in range(1, len(beta_values) + 1): #complicated code
 #             H[(i+j) % n, i] = beta_values[j-1]
 #             H[i, (i+j) % n] = beta_values[j-1]
 #     return H
