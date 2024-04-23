@@ -69,3 +69,32 @@ print(wavefunctions)
 # H_naphthalene = construct_hamiltonian(n_naphthalene, [beta_naphthalene])
 # energies_naphthalene, _ = solve_huckel_model(H_naphthalene)
 # print("Molecular orbital energies for naphthalene:", energies_naphthalene)
+
+import matplotlib.pyplot as plt
+
+# Example data (replace with your eigenvalues and eigenvectors)
+energies = np.array([-10, -8, -6, -4])  # Eigenvalues (energies)
+orbitals = np.array([[0.1, 0.2, 0.3, 0.4],  # Eigenvectors (molecular orbitals)
+                     [0.2, 0.3, 0.4, 0.5],
+                     [0.3, 0.4, 0.5, 0.6],
+                     [0.4, 0.5, 0.6, 0.7]])
+
+# Create figure and axes
+fig, ax = plt.subplots()
+
+# Plot molecular orbitals
+for i, orbital in enumerate(orbitals):
+    ax.plot(orbital, label=f'MO {i+1}')
+
+# Plot energy levels
+for energy in energies:
+    ax.axhline(y=energy, color='gray', linestyle='--', linewidth=0.5)
+
+# Add labels and legend
+ax.set_xlabel('Atomic Index')
+ax.set_ylabel('Energy (eV)')
+ax.set_title('Molecular Orbitals and Energy Levels')
+ax.legend()
+
+# Show plot
+plt.show()
