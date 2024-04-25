@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import turtle
 
 def calculate_distance(atom_i, atom_j): #calculates the Euclidean distance between two atoms based on their coordinates
     return np.linalg.norm(atom_i - atom_j) #atom i an atom j are numpy arrays representating the coordinates of two atoms
@@ -43,6 +45,84 @@ print("\nMolecular Orbitals (Eigenvectors):")
 print(wavefunctions)
 
 
+# #plot of energy levels-ASK ABOUT DEGENERACY
+# x_values = np.zeros_like(energies)  # Use zeros for x-values (all points aligned)
+# #plt.scatter(x_values, energies, color='blue', label='Energy Levels')
+# #plt.plot([0]*len(energies), energies, linestyle='--', color='blue', label='Energy Levels')
+# plt.scatter(x_values, energies, linestyle='-', color='blue', label='Energy Levels')
+
+# # Add labels and title
+# plt.xlabel('Index')
+# plt.ylabel('Energy (eV)')
+# plt.title('Energy Levels of Benzene')
+
+# # Show plot
+# plt.show()
+
+# benzene using turtle
+
+# Creating the window
+# window = turtle.Screen()
+# window.setup(600, 600, startx=0, starty=100)
+# window.bgcolor('black')
+
+# # Colours
+# #colors = ['red', 'purple', 'blue', 'green', 'orange', 'yellow']
+
+# # Creating the turtle
+# t = turtle.Turtle()
+# t.speed(0)  # Set the fastest speed
+# t.color('cyan')
+
+# #benzene using 1 colour
+# for x in range(100): 
+#     t.width(x // 10 + 1)
+#     t.forward(x)
+#     t.left(59)  # Adjust the angle to get the benzene shape
+
+# # # Keeping the window open
+# turtle.done()
+
+#benzene using matplotlib
+
+# Define the coordinates of the benzene molecule
+benzene_coordinates = np.array([
+    [0, 1],
+    [np.sqrt(3)/2, 0.5], #The np.sqrt(3)/2 value is used to ensure that the bonds have equal length, which is important for the structure of the benzene molecule.
+    [np.sqrt(3)/2, -0.5],
+    [0, -1],
+    [-np.sqrt(3)/2, -0.5],
+    [-np.sqrt(3)/2, 0.5],
+    [0, 1]  # Closing the loop
+])
+
+# Define wavefunction sizes and phases (example values)
+wavefunction_sizes = [0.2, 0.5, 0.8, 1.0, 0.7, 0.4, 0.1]
+wavefunction_phases = ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'cyan']
+
+# Plot benzene coordinates
+plt.figure(figsize=(6, 6))
+plt.plot(benzene_coordinates[:, 0], benzene_coordinates[:, 1], 'o-', color='black')
+
+#Plot circles with different sizes and colors
+for i, (x, y) in enumerate(benzene_coordinates):
+    size = wavefunction_sizes[i] * 100  # Adjust size for better visualization
+    color = wavefunction_phases[i]
+    circle = plt.Circle((x, y), size, color=color, alpha=0.5)
+    plt.gca().add_artist(circle)
+
+
+# Plot the benzene molecule
+# plt.figure(figsize=(6, 6))
+# plt.plot(benzene_coordinates[:, 0], benzene_coordinates[:, 1], 'o-', color='blue')
+# plt.xlabel('X')
+# plt.ylabel('Y')
+# plt.title('Benzene Molecule')
+# plt.axis('equal')  # Equal aspect ratio
+# plt.grid(True)
+# plt.show()
+
+
 # def construct_hamiltonian(n, beta_values): #constructs hamiltonian matrix for cyclic pi system with n carbon atoms and a list of beta parameters
 #     H = np.zeros((n, n)) #output is hamiltonian matrix representing the system
 #     alpha = 0  # Energy of isolated atomic orbitals (set to 0 for simplicity)
@@ -70,31 +150,3 @@ print(wavefunctions)
 # energies_naphthalene, _ = solve_huckel_model(H_naphthalene)
 # print("Molecular orbital energies for naphthalene:", energies_naphthalene)
 
-import matplotlib.pyplot as plt
-
-# Example data (replace with your eigenvalues and eigenvectors)
-energies = np.array([-10, -8, -6, -4])  # Eigenvalues (energies)
-orbitals = np.array([[0.1, 0.2, 0.3, 0.4],  # Eigenvectors (molecular orbitals)
-                     [0.2, 0.3, 0.4, 0.5],
-                     [0.3, 0.4, 0.5, 0.6],
-                     [0.4, 0.5, 0.6, 0.7]])
-
-# Create figure and axes
-fig, ax = plt.subplots()
-
-# Plot molecular orbitals
-for i, orbital in enumerate(orbitals):
-    ax.plot(orbital, label=f'MO {i+1}')
-
-# Plot energy levels
-for energy in energies:
-    ax.axhline(y=energy, color='gray', linestyle='--', linewidth=0.5)
-
-# Add labels and legend
-ax.set_xlabel('Atomic Index')
-ax.set_ylabel('Energy (eV)')
-ax.set_title('Molecular Orbitals and Energy Levels')
-ax.legend()
-
-# Show plot
-plt.show()
