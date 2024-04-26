@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import turtle
 
 def calculate_distance(atom_i, atom_j): #calculates the Euclidean distance between two atoms based on their coordinates
     return np.linalg.norm(atom_i - atom_j) #atom i an atom j are numpy arrays representating the coordinates of two atoms
@@ -44,83 +43,70 @@ print(energies)
 print("\nMolecular Orbitals (Eigenvectors):")
 print(wavefunctions)
 
+#plot benzene
+# benzene_coordinates_graph = np.array([
+#     [-4.461121, 1.187057, -0.028519],
+#     [-3.066650, 1.263428, -0.002700],
+#     [-2.303848, 0.094131, 0.041626],
+#     [-2.935547, -1.151550, 0.059845],
+#     [-4.330048, -1.227982, 0.034073],
+#     [-5.092743, -0.058655, -0.010193],
+#     [-4.461121, 1.187057, -0.028519] #to close the loop
+# ])
 
-# #plot of energy levels-ASK ABOUT DEGENERACY
-# x_values = np.zeros_like(energies)  # Use zeros for x-values (all points aligned)
-# #plt.scatter(x_values, energies, color='blue', label='Energy Levels')
-# #plt.plot([0]*len(energies), energies, linestyle='--', color='blue', label='Energy Levels')
-# plt.scatter(x_values, energies, linestyle='-', color='blue', label='Energy Levels')
+# # Calculate circle sizes based on wavefunction magnitudes
+# circle_sizes = [np.sum(np.abs(wf)) for wf in wavefunctions.T]
+# print("circle_sizes", circle_sizes)
 
-# # Add labels and title
-# plt.xlabel('Index')
-# plt.ylabel('Energy (eV)')
-# plt.title('Energy Levels of Benzene')
+# # Scale circle sizes for better visualization
+# scaled_sizes = [size * 2000 for size in circle_sizes]  # Adjust the scaling factor as needed
+# print("scaled_sizes", scaled_sizes)
 
-# # Show plot
-# plt.show()
+# #Plot the benzene molecule
+# plt.figure(figsize=(10, 10))
+# plt.plot(benzene_coordinates_graph[:, 0], benzene_coordinates_graph[:, 1], 'o-', color='pink')
 
-# benzene using turtle
-
-# Creating the window
-# window = turtle.Screen()
-# window.setup(600, 600, startx=0, starty=100)
-# window.bgcolor('black')
-
-# # Colours
-# #colors = ['red', 'purple', 'blue', 'green', 'orange', 'yellow']
-
-# # Creating the turtle
-# t = turtle.Turtle()
-# t.speed(0)  # Set the fastest speed
-# t.color('cyan')
-
-# #benzene using 1 colour
-# for x in range(100): 
-#     t.width(x // 10 + 1)
-#     t.forward(x)
-#     t.left(59)  # Adjust the angle to get the benzene shape
-
-# # # Keeping the window open
-# turtle.done()
-
-#benzene using matplotlib
-
-# Define the coordinates of the benzene molecule
-benzene_coordinates = np.array([
-    [0, 1],
-    [np.sqrt(3)/2, 0.5], #The np.sqrt(3)/2 value is used to ensure that the bonds have equal length, which is important for the structure of the benzene molecule.
-    [np.sqrt(3)/2, -0.5],
-    [0, -1],
-    [-np.sqrt(3)/2, -0.5],
-    [-np.sqrt(3)/2, 0.5],
-    [0, 1]  # Closing the loop
-])
-
-# Define wavefunction sizes and phases (example values)
-wavefunction_sizes = [0.2, 0.5, 0.8, 1.0, 0.7, 0.4, 0.1]
-wavefunction_phases = ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'cyan']
-
-# Plot benzene coordinates
-plt.figure(figsize=(6, 6))
-plt.plot(benzene_coordinates[:, 0], benzene_coordinates[:, 1], 'o-', color='black')
-
-#Plot circles with different sizes and colors
-for i, (x, y) in enumerate(benzene_coordinates):
-    size = wavefunction_sizes[i] * 100  # Adjust size for better visualization
-    color = wavefunction_phases[i]
-    circle = plt.Circle((x, y), size, color=color, alpha=0.5)
-    plt.gca().add_artist(circle)
-
-
-# Plot the benzene molecule
-# plt.figure(figsize=(6, 6))
-# plt.plot(benzene_coordinates[:, 0], benzene_coordinates[:, 1], 'o-', color='blue')
+# # Plot circles on top of the markers (excluding the duplicate last coordinate)
+# for i in range(len(benzene_coordinates_graph) - 1):
+#     plt.scatter(benzene_coordinates_graph[i, 0], benzene_coordinates_graph[i, 1], s=scaled_sizes[i], color='green', alpha=0.5)
+    
 # plt.xlabel('X')
 # plt.ylabel('Y')
-# plt.title('Benzene Molecule')
+# plt.title('Benzene Molecule with Molecular Orbital Sizes')
 # plt.axis('equal')  # Equal aspect ratio
 # plt.grid(True)
 # plt.show()
+
+# #plot of energy levels-ASK ABOUT DEGENERACY
+#x_values = np.zeros_like(energies)  # Use zeros for x-values (all points aligned)
+x_values_benzene = [0, 0, 0.1, 0, 0.1, 0]
+y_values_benzene = [-12, -11, -11, -9, -9, -8]
+plt.scatter(x_values_benzene, y_values_benzene, linestyle='-', color='blue', label='Energy Levels')
+
+# Set the x-axis tick locations and labels
+plt.xticks([0, 0.1], ['0', '0.1'])
+
+# Adjust the margins to make the x-axis tick marks visually closer
+plt.margins(x=5)
+
+# Add labels and title
+plt.xlabel('Index')
+plt.ylabel('Energy (eV)')
+plt.title('Energy Levels of Benzene')
+
+# Show plot
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
 
 
 # def construct_hamiltonian(n, beta_values): #constructs hamiltonian matrix for cyclic pi system with n carbon atoms and a list of beta parameters
