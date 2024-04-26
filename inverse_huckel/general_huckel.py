@@ -43,95 +43,50 @@ print(energies)
 print("\nMolecular Orbitals (Eigenvectors):")
 print(wavefunctions)
 # # Plot each individual molecular orbital on its own graph
-# benzene_coordinates_graph = np.array([
-#     [-4.461121, 1.187057, -0.028519],
-#     [-3.066650, 1.263428, -0.002700],
-#     [-2.303848, 0.094131, 0.041626],
-#     [-2.935547, -1.151550, 0.059845],
-#     [-4.330048, -1.227982, 0.034073],
-#     [-5.092743, -0.058655, -0.010193],
-#     [-4.461121, 1.187057, -0.028519] #to close the loop
-# ])
-# num_mos = len(wavefunctions[0]) #calculates length of mo by counting the length of the first row of wavefunctions array
-# for i in range(num_mos): #iterates over each molecular orbital
-#     plt.figure(figsize=(6, 6)) #creates a new figure for each molecular orbital
-#     plt.plot(benzene_coordinates_graph[:, 0], benzene_coordinates_graph[:, 1], 'o-', color='blue') #plots benzene using its x and y coordinates. o says that markers should be used and lines should connect the markers
-#     circle_sizes = np.abs(wavefunctions[:, i]) * 5000 #the absolute values of the mo from wavefunctions are multiplied to scale them for visualisation. wavefunctions syntax: selects the ith mo and all rows of the wavefunction array
-#     colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]] #if coefficient is positive then circle green, if negative circle red
-#     for j in range(len(benzene_coordinates)): #plot a scatter point for each atom in the benzene molecule.
-#         plt.scatter(benzene_coordinates_graph[j, 0], benzene_coordinates_graph[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
-#     plt.xlabel('X')
-#     plt.ylabel('Y')
-#     plt.title(f'Molecular Orbital {i+1}') #line sets the title of the plot to indiciate the mo being plotted
-#     plt.axis('equal') #ensures circles appear circular rather than stretched
-#     plt.grid(True)
-#     plt.show()
+benzene_coordinates_graph = np.array([
+    [-4.461121, 1.187057, -0.028519],
+    [-3.066650, 1.263428, -0.002700],
+    [-2.303848, 0.094131, 0.041626],
+    [-2.935547, -1.151550, 0.059845],
+    [-4.330048, -1.227982, 0.034073],
+    [-5.092743, -0.058655, -0.010193],
+    [-4.461121, 1.187057, -0.028519] #to close the loop
+])
+num_mos = len(wavefunctions[0]) #calculates length of mo by counting the length of the first row of wavefunctions array
+for i in range(num_mos): #iterates over each molecular orbital
+    plt.figure(figsize=(6, 6)) #creates a new figure for each molecular orbital
+    plt.plot(benzene_coordinates_graph[:, 0], benzene_coordinates_graph[:, 1], 'o-', color='blue') #plots benzene using its x and y coordinates. o says that markers should be used and lines should connect the markers
+    circle_sizes = np.abs(wavefunctions[:, i]) * 5000 #the absolute values of the mo from wavefunctions are multiplied to scale them for visualisation. wavefunctions syntax: selects the ith mo and all rows of the wavefunction array
+    colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]] #if coefficient is positive then circle green, if negative circle red
+    for j in range(len(benzene_coordinates)): #plot a scatter point for each atom in the benzene molecule.
+        plt.scatter(benzene_coordinates_graph[j, 0], benzene_coordinates_graph[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title(f'Molecular Orbital {i+1}') #line sets the title of the plot to indiciate the mo being plotted
+    plt.axis('equal') #ensures circles appear circular rather than stretched
+    plt.grid(True)
+    plt.show()
 
 
-# #plot of energy levels-ASK ABOUT DEGENERACY
-# #x_values = np.zeros_like(energies)  # Use zeros for x-values (all points aligned)
-# x_values_benzene = [0, 0, 0.1, 0, 0.1, 0]
-# y_values_benzene = [-12, -11, -11, -9, -9, -8]
-# plt.scatter(x_values_benzene, y_values_benzene, linestyle='-', color='blue', label='Energy Levels')
-
-# # Set the x-axis tick locations and labels
-# #plt.xticks([0, 0.1], ['0', '0.1'])
-
-# # Adjust the margins to make the x-axis tick marks visually closer
-# plt.margins(x=5)
-
-# # Plot the energy levels as horizontal lines
-# for y in y_values_benzene:
-#     plt.hlines(y, xmin=0, xmax=0.1, color='blue')
-
-# # Add labels and title
-# plt.xlabel('Index')
-# plt.ylabel('Energy (eV)')
-# plt.title('Energy Levels of Benzene')
-
-# # Show plot
-# plt.show()
-
+# #plot of energy levels- benznene example
 # # Define the energy levels
 # x_values_benzene = [0, 0, 0.1, 0, 0.1, 0]
 # y_values_benzene = [-12, -11, -11, -9, -9, -8]
 
 # # Plot the energy levels as horizontal lines
-# for y in y_values_benzene:
-#     plt.hlines(y, xmin=0, xmax=0.1, color='blue')
-
-# # Set the x-axis tick locations and labels
-# plt.xticks([0, 0.1], ['0', '0.1'])
+# for i in range(len(x_values_benzene)): #this loop iterates over each energy level defined
+#     plt.hlines(y_values_benzene[i], xmin=x_values_benzene[i], xmax=x_values_benzene[i] + 0.08, color='blue') #adds a horizontal line on each coordinate
 
 # # Adjust the margins to make the x-axis tick marks visually closer
-# plt.margins(x=5)
+# plt.margins(x=3)
 
 # # Add labels and title
-# plt.xlabel('Index')
+# #plt.xlabel('Index')
 # plt.ylabel('Energy (eV)')
 # plt.title('Energy Levels of Benzene')
 
 # # Show plot
 # plt.show()
-
-# Define the energy levels
-x_values_benzene = [0, 0, 0.1, 0, 0.1, 0]
-y_values_benzene = [-12, -11, -11, -9, -9, -8]
-
-# Plot the energy levels as horizontal lines
-for i in range(len(x_values_benzene)): #this loop iterates over each energy level defined
-    plt.hlines(y_values_benzene[i], xmin=x_values_benzene[i], xmax=x_values_benzene[i] + 0.08, color='blue') #adds a horizontal line on each coordinate
-
-# Adjust the margins to make the x-axis tick marks visually closer
-plt.margins(x=3)
-
-# Add labels and title
-#plt.xlabel('Index')
-plt.ylabel('Energy (eV)')
-plt.title('Energy Levels of Benzene')
-
-# Show plot
-plt.show()
 
 
 
