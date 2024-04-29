@@ -50,6 +50,7 @@ beta = -0.5  # Resonance integral between adjacent atoms
 
 H = huckel_hamiltonian.HuckelHamiltonian(n, alpha, beta)
 
+print("\nHamiltonian:")
 print(H.H)
 
 energies, wavefunctions = H.solve_huckel_hamiltonian()
