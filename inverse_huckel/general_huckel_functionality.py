@@ -27,32 +27,115 @@ class MolecularSystem:
     def solve_eigenvalue_problem(self):
         return np.linalg.eigh(self.H)
     
-    def plot_molecular_orbitals(self, coordinates): #doesn't work
+    def plot_molecular_orbitals(self, wavefunction_index):
+        # Solve the eigenvalue problem
         energies, wavefunctions = self.solve_eigenvalue_problem()
-        molecule_coordinates_graph = np.append(coordinates, [coordinates[0]], axis=0)
-        num_mos = len(wavefunctions[0])
 
-        # Draw lines for pairs of atoms with short distances
-        threshold_distance = 1.5  # Adjust this threshold as needed
-        for i in range(len(coordinates)):
-            for j in range(i + 1, len(coordinates)):
-                distance = np.linalg.norm(coordinates[i] - coordinates[j])
-                if distance <= threshold_distance:
-                    plt.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], 'k-')
+        # Plot the Naphthalene structure
+        plt.figure(figsize=(8, 6))
+        print("hi")
+        for i in range(len(self.coordinates)):
+            plt.plot([self.coordinates[i, 0], self.coordinates[(i + 1) % len(self.coordinates), 0]],
+                     [self.coordinates[i, 1], self.coordinates[(i + 1) % len(self.coordinates), 1]], 'k-')
 
-        for i in range(num_mos):
-            plt.figure(figsize=(6, 6))
-            plt.plot(molecule_coordinates_graph[:, 0], molecule_coordinates_graph[:, 1], 'o-', color='blue')
-            circle_sizes = np.abs(wavefunctions[:, i]) * 5000
-            colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
-            for j in range(len(coordinates)):
-                plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
-            plt.xlabel('X')
-            plt.ylabel('Y')
-            plt.title(f'Molecular Orbital {i+1}')
-            plt.axis('equal')
-            plt.grid(True)
-            plt.show()
+        # Overlay the structure with circles representing the molecular orbitals
+        circle_sizes = np.abs(wavefunctions[:,wavefunction_index]) * 5000
+        colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
+        for j in range(len(self.coordinates)):
+            plt.scatter(self.coordinates[j, 0], self.coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
+
+        # Set plot labels and title
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.title('Molecular Orbitals of Naphthalene')
+        plt.axis('equal')
+        plt.grid(True)
+
+        # Show the plot
+        plt.show()
+
+    # def plot_molecular_orbitals(self, coordinates):
+    #     energies, wavefunctions = self.solve_eigenvalue_problem()
+    #     molecule_coordinates_graph = np.append(coordinates, [coordinates[0]], axis=0) #why is it not forming a closed loop then?
+    #     num_mos = len(wavefunctions[0])
+
+    #     plt.figure(figsize=(6, 6))
+    #     plt.plot(molecule_coordinates_graph[:, 0], molecule_coordinates_graph[:, 1], 'o-', color='blue') #plot of the napthalene structure
+    #     for i in range(num_mos): #plotting molecular orbitals
+    #         circle_sizes = np.abs(wavefunctions[:, i]) * 5000
+    #         colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
+    #         for j in range(len(coordinates)):
+    #             plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
+    #         plt.xlabel('X')
+    #         plt.ylabel('Y')
+    #         plt.title(f'Molecular Orbital {i+1}')
+    #         plt.axis('equal')
+    #         plt.grid(True)
+        
+    #     plt.show()
+    
+    
+    
+    
+    # def plot_molecular_orbitals(self, coordinates): #doesn't work, plots two graphs again.
+    #     energies, wavefunctions = self.solve_eigenvalue_problem()
+    #     molecule_coordinates_graph = np.append(coordinates, [coordinates[0]], axis=0)
+    #     num_mos = len(wavefunctions[0])
+
+    #     # Draw lines for pairs of atoms with short distances- create a method for this and call it into the plotmolecularorbitals function
+    #     threshold_distance = 0.5  # Adjust this threshold as needed
+    #     for i in range(len(coordinates)):
+    #         for j in range(i + 1, len(coordinates)):
+    #             distance = np.linalg.norm(coordinates[i] - coordinates[j])
+    #             if distance <= threshold_distance:
+    #                 plt.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], 'k-')
+
+    #     for i in range(num_mos):
+    #         plt.figure(figsize=(6, 6))
+    #         plt.plot(molecule_coordinates_graph[:, 0], molecule_coordinates_graph[:, 1], 'o-', color='blue')
+    #         circle_sizes = np.abs(wavefunctions[:, i]) * 5000
+    #         colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
+    #         for j in range(len(coordinates)):
+    #             plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
+    #         plt.xlabel('X')
+    #         plt.ylabel('Y')
+    #         plt.title(f'Molecular Orbital {i+1}')
+    #         plt.axis('equal')
+    #         plt.grid(True)
+            
+    #         # Connect points with lines for clarity
+    #         # for j in range(len(coordinates) - 1):
+    #         #     plt.plot([coordinates[j, 0], coordinates[j + 1, 0]], [coordinates[j, 1], coordinates[j + 1, 1]], 'k-')
+    #         # plt.plot([coordinates[-1, 0], coordinates[0, 0]], [coordinates[-1, 1], coordinates[0, 1]], 'k-')
+
+    #         plt.show()
+    
+    # def plot_molecular_orbitals(self, coordinates): #doesn't work but gives a correct plot for napthalene
+    #     energies, wavefunctions = self.solve_eigenvalue_problem()
+    #     molecule_coordinates_graph = np.append(coordinates, [coordinates[0]], axis=0)
+    #     num_mos = len(wavefunctions[0])
+
+    #     # Draw lines for pairs of atoms with short distances
+    #     threshold_distance = 1.5  # Adjust this threshold as needed
+    #     for i in range(len(coordinates)):
+    #         for j in range(i + 1, len(coordinates)):
+    #             distance = np.linalg.norm(coordinates[i] - coordinates[j])
+    #             if distance <= threshold_distance:
+    #                 plt.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], 'k-')
+
+    #     for i in range(num_mos):
+    #         plt.figure(figsize=(6, 6))
+    #         plt.plot(molecule_coordinates_graph[:, 0], molecule_coordinates_graph[:, 1], 'o-', color='blue')
+    #         circle_sizes = np.abs(wavefunctions[:, i]) * 5000
+    #         colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
+    #         for j in range(len(coordinates)):
+    #             plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
+    #         plt.xlabel('X')
+    #         plt.ylabel('Y')
+    #         plt.title(f'Molecular Orbital {i+1}')
+    #         plt.axis('equal')
+    #         plt.grid(True)
+    #         plt.show()
     
     
     
@@ -74,13 +157,13 @@ class MolecularSystem:
     #         plt.axis('equal')
     #         plt.grid(True)
     #         plt.show()
-    # def plot_molecular_orbitals(self, coordinates):
-    #     print("coordinates:", coordinates)
+
+
+    # def plot_molecular_orbitals(self, coordinates): #original code now not working
     #     energies, wavefunctions = self.solve_eigenvalue_problem()
-    #     print("energies:", energies)
-    #     print("wavefunctions:", wavefunctions)
     #     molecule_coordinates_graph = np.append(self.coordinates, [self.coordinates[0]], axis=0)
     #     num_mos = len(wavefunctions[0])
+    #     print("hi")
     #     for i in range(num_mos):
     #         plt.figure(figsize=(6, 6))
     #         plt.plot(molecule_coordinates_graph[:, 0], molecule_coordinates_graph[:, 1], 'o-', color='blue')

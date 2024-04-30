@@ -16,9 +16,9 @@ benzene_coordinates = np.array([
 alpha = -10
 beta = -1
 cutoff_distance = 2.0
-
+ #benzene
 # molecular_system = MolecularSystem(benzene_coordinates, alpha, beta, cutoff_distance)
-# molecular_system.plot_molecular_orbitals()
+# molecular_system.plot_molecular_orbitals() #i didn't have to include this before i tried to change the code
 # molecular_system.plot_energy_levels()
 
 napthalene_coordinates = np.array([
@@ -34,33 +34,12 @@ napthalene_coordinates = np.array([
     [-1.24592, 1.40390, -0.00000],
 ])
 
-# napthalene_coordinates_graph = np.array([
-#     [ 1.24593,1.40391, -0.0000],
-#     [0.00001, 0.71731, -0.00000],
-#     [-0.00000, -0.71730, -0.00000],
-#     [1.24592, -1.40388, -0.00000],
-#     [2.43659, -0.70922, -0.00000],
-#     [2.43659, 0.70921, 0.00000],
-#     [-1.24593, -1.40387, 0.00000],
-#     [-2.43660, -0.70921, 0.00000],
-#     [-2.43660, 0.70921, 0.00000],
-#     [-1.24592, 1.40390, -0.00000],
-#     [ 1.24593,1.40391, -0.0000], # to close loop
-# ])
-
 
 molecular_system = MolecularSystem(napthalene_coordinates, alpha, beta, cutoff_distance)
-molecular_system.plot_molecular_orbitals()
+molecular_system.plot_molecular_orbitals(napthalene_coordinates)
 #molecular_system.plot_energy_levels()
 
 
 # molecular_system = MolecularSystem(benzene_coordinates, alpha, beta, cutoff_distance)
 # molecular_system.plot_molecular_orbitals()
 
-# # napthalene_coordinates_graph = np.append(napthalene_coordinates, [napthalene_coordinates[0]], axis=0)
-
-# # molecular_system = MolecularSystem(napthalene_coordinates, alpha, beta, cutoff_distance)
-# # molecular_system.plot_molecular_orbitals(napthalene_coordinates)
-
-# # molecular_system = MolecularSystem(napthalene_coordinates, alpha, beta, cutoff_distance)
-# # molecular_system.plot_molecular_orbitals()
