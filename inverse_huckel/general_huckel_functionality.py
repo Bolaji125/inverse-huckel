@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import torch
 
 class MolecularSystem:
     def __init__(self, coordinates, alpha, beta, cutoff_distance):
@@ -29,6 +30,19 @@ class MolecularSystem:
         #print (self.H)
         #print (np.linalg.eigh(self.H))
         return np.linalg.eigh(self.H)
+    
+    def solve_eigenvalue_problem_pytorch(self):
+        H = self.construct_hamiltonian()
+        H = torch.from_numpy(H)
+        # Perform eigenvalue decomposition using PyTorch
+        eigenvalues_complex, eigenvectors = torch.linalg.eig(H)
+
+        print("Shape of eigenvalues_complex:", eigenvalues_complex)  # Print the shape of eigenvalues_complex
+                
+        # Extract the real part of eigenvalues
+        eigenvalues_real = eigenvalues_complex.numpy()
+
+        return eigenvalues_real
     
     def plot_molecular_orbitals(self, coordinates,i, molecule_name = "Molecule"):
         energies, wavefunctions = self.solve_eigenvalue_problem()
