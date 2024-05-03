@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 class MolecularSystem:
     def __init__(self, coordinates, alpha, beta, cutoff_distance):
@@ -34,19 +35,23 @@ class MolecularSystem:
         #print("energy of MO ", i+1, ":", energies[i])
         #print(energies)
         num_mos = len(wavefunctions[0]) #calculates the number of mos based on the length of the wavenfunctions array
-
+        fig = plt.figure()
         # Draw lines for pairs of atoms with short distances
         self.draw_short_distance_lines(coordinates) #calling the method below
+
 
         circle_sizes = np.abs(wavefunctions[:, i]) * 5000
         colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
         for j in range(len(coordinates)):
             plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
-        plt.xlabel('X coordinates/$\AA$')
-        plt.ylabel('Y coordinates/$\AA$')
+        plt.xlabel('X / $\AA$')
+        plt.ylabel('Y / $\AA$')
         plt.title( f'Molecular Orbital {i+1} of {molecule_name}')
         plt.axis('equal')
         plt.grid(True)
+        file_name = f'Molecular Orbital {i+1} of {molecule_name}.pdf'
+        file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+        fig.savefig(file_path)
         plt.show()
 
     def draw_short_distance_lines(self, coordinates):
@@ -78,7 +83,20 @@ class MolecularSystem:
         plt.xlabel('Energy Levels') #is this label ok?
         plt.ylabel('Energy (eV)')
         plt.title(f'Energy Levels of {molecule_name}')
+
+         # Define the file path and name based on the molecule name
+        file_name = f"{molecule_name.replace(' ', '_')}_energy_levels.pdf"
+        file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+        
+        # Save the plot
+        plt.savefig(file_path)
+
         plt.show()
+# Define the directory where you want to save the file
+# directory = 'Documents/GitHub/inverse-huckel.git/inverse_huckel'
 
-  
+# # Construct the full file path
+# file_path = os.path.join(os.path.expanduser('~'), directory)
 
+# # Print the file path
+# print("File path:", file_path)
