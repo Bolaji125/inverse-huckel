@@ -20,17 +20,17 @@ benzene_coordinates = np.array([
 
  #benzene
 
-molecular_system = MolecularSystem(benzene_coordinates, alpha, beta, cutoff_distance)
+#molecular_system = MolecularSystem(benzene_coordinates, alpha, beta, cutoff_distance)
 # molecular_system.plot_molecular_orbitals(benzene_coordinates, 5, "Benzene")
 
 # energies_benzene = molecular_system.solve_eigenvalue_problem()[0]  # obtaining the energy, [0] extracts the first element of the tuple which corresponds to the eigenvalues
 # molecular_system.plot_energy_levels(energies_benzene, "Benzene")
 # print("benzene", energies_benzene)
 
-energies_pytorch = molecular_system.solve_eigenvalue_problem_pytorch()
-print("energies", energies_pytorch)
+#energies_pytorch = molecular_system.solve_eigenvalue_problem_pytorch()
 #molecular_system.plot_molecular_orbitals_pytorch(benzene_coordinates, 0, "Benzene")
-molecular_system.plot_energy_levels_pytorch(energies_pytorch, "Benzene")
+#molecular_system.plot_energy_levels_pytorch(energies_pytorch, "Benzene")
+#print("energies", energies_pytorch)
 
 
 
@@ -50,16 +50,16 @@ napthalene_coordinates = np.array([
 ])
 
 
-#molecular_system = MolecularSystem(napthalene_coordinates, alpha, beta, cutoff_distance)
+molecular_system = MolecularSystem(napthalene_coordinates, alpha, beta, cutoff_distance)
 # molecular_system.plot_molecular_orbitals(napthalene_coordinates,9, "Napthalene")
 
 
-# energies_napthalene = molecular_system.solve_eigenvalue_problem()[0]
-# molecular_system.plot_energy_levels(energies_napthalene, "Napthalene")
+#energies_napthalene = molecular_system.solve_eigenvalue_problem()[0]
+#molecular_system.plot_energy_levels(energies_napthalene, "Napthalene")
 
 energies_pytorch = molecular_system.solve_eigenvalue_problem_pytorch()
-#molecular_system.plot_molecular_orbitals_pytorch(napthalene_coordinates, 0, "Napthalene")
-#molecular_system.plot_energy_levels_pytorch(energies_pytorch, "Napthalene")
+# #molecular_system.plot_molecular_orbitals_pytorch(napthalene_coordinates, 0, "Napthalene")
+molecular_system.plot_energy_levels_pytorch(energies_pytorch, "Napthalene")
 
 
 

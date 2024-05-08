@@ -100,7 +100,7 @@ class MolecularSystem:
         plt.show()
 
 
-    def plot_energy_levels(self, energies, molecule_name="Molecule"):
+    def plot_energy_levels(self, energies, molecule_name="Molecule"): #isn't reproducable for pytorch because enrgies aren't ordered
         #print("Energies:", [f"{energy:.16f}" for energy in energies])  # Print the energies with full precision
         prev_energy = None #initialises previous enegy to none. it is used to keep track of the previous energy while iterating through the list of energies.
         x_offset = 0  # x offset is the starting point for drawing each horizontal line on the plot. setting it to 0 means that first energy level will be drawn from the leftmost side of the plot.
@@ -131,48 +131,50 @@ class MolecularSystem:
 
         plt.show()
 
-    def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"):
-        eigenvalues, _ = energies  # Unpack the tuple and ignore the second element
-        
-        # Convert eigenvalues to a PyTorch tensor
-        eigenvalues = torch.tensor(eigenvalues).clone().detach()
 
-        # Group unique eigenvalues and their counts
-        unique_eigenvalues, counts = torch.unique(eigenvalues, return_counts=True)
+    def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #works but benezene energy level ver small.doesn't work for napthalene
+        eigenvalues, _ = energies  # Unpack the tuple, _ is a paceholder to ignore the second element of the tuple as it is not needed
+        #eigenvalues = torch.tensor(eigenvalues)  # Convert eigenvalues to a PyTorch tensor
+        eigenvalues = eigenvalues.clone().detach()
+        print("eigenvalues", eigenvalues)
 
-        prev_x_offset = 0  # Initialize variable to keep track of the starting position of each energy level line
+        prev_energy = None #keeps track of previous energy level
+        x_offset = 0   #determines the starting position of each energy level line on the plot
+        #tolerance = 1e-4 #tolerance determines if two energy levels are considered degenerate
 
-        for energy, count in zip(unique_eigenvalues.numpy(), counts.numpy()):
-            # Calculate x_offsets with spacing between degenerate energy levels
-            x_offset = prev_x_offset
-            for _ in range(count):
-                # Extend the line length to 0.5 for better visibility
-                plt.hlines(energy, xmin=x_offset, xmax=x_offset + 0.8, color='blue')
-                x_offset += 1.5  # Adjust the spacing between lines to make them appear bigger
-            
-            prev_x_offset = x_offset + 0.5  # Increase the offset for the next group of lines
+        for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
+            # if prev_energy is not None and torch.abs(torch.tensor(energy) - torch.tensor(prev_energy)) < tolerance:
+            #     pass 
+            # else:
+            #     x_offset = 0
+
+            plt.hlines(energy, xmin=x_offset, xmax=0.3 + x_offset, color='blue')  
+            prev_energy = energy 
+            x_offset += 0.5  #line determines energy spacing between consecutive energy levels
 
         plt.margins(x=3)
         plt.xlabel('Energy Levels') 
         plt.ylabel('Energy (eV)')
         plt.title(f'Energy Levels of {molecule_name}')
-        plt.xlim(0, x_offset + 1)
         plt.show()
 
-    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"):
-    #     eigenvalues, _ = energies  # Unpack the tuple and ignores the second element. why do we need to type _ then??????
+    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #doesn't work correctly as 5 levels instead of 6.
+    #     eigenvalues, _ = energies  # Unpack the tuple
     #     eigenvalues = torch.tensor(eigenvalues).clone().detach()
 
-    #     # Group unique eigenvalues and their counts
-    #     unique_eigenvalues, counts = torch.unique(eigenvalues, return_counts=True) #finds uniquw elements in the eigenvalues tensor anf their respective counts.return counts = tru means we want to get the counts of each unique element
+    #     prev_energy = None 
+    #     x_offset = 0   # Determine the starting position of each energy level line on the plot
+    #     spacing = 0.3  # Set the spacing between consecutive energy levels
+    #     degenerate_spacing = 0.1  # Set the additional spacing for degenerate energy levels
 
-    #     prev_x_offset = 0 #initialise variable to keep track of the starting position of each energy level line
+    #     for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
+    #         if prev_energy is not None and energy == prev_energy:
+    #             x_offset += degenerate_spacing
+    #         else:
+    #             x_offset += spacing
 
-    #     for energy, count in zip(unique_eigenvalues.numpy(), counts.numpy()): #?????this loop iterates over each unique eigenvalue and its count. unique_eigenvalues and counts tensors converted to NumPy arrays and iterate over them simultaneously using zip.
-    #         x_offsets = np.linspace(prev_x_offset, prev_x_offset + 0.1, count, endpoint=False)
-    #         for x_offset in x_offsets:
-    #             plt.hlines(energy, xmin=x_offset, xmax=x_offset + 0.3, color='blue')
-    #         prev_x_offset += 0.5
+    #         plt.hlines(energy, xmin=x_offset, xmax=spacing + x_offset, color='blue')  
+    #         prev_energy = energy 
 
     #     plt.margins(x=3)
     #     plt.xlabel('Energy Levels') 
@@ -180,27 +182,18 @@ class MolecularSystem:
     #     plt.title(f'Energy Levels of {molecule_name}')
     #     plt.show()
 
-    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"):
+    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #works but doesn't look right. see week 3 notes for logic.
     #     eigenvalues, _ = energies  # Unpack the tuple
-    #     #eigenvalues = torch.tensor(eigenvalues)  # Convert eigenvalues to a PyTorch tensor
     #     eigenvalues = torch.tensor(eigenvalues).clone().detach()
-    #     print("eigenvalues", eigenvalues)
 
     #     prev_energy = None 
-    #     x_offset = 0  
-    #     tolerance = 1e-4
+    #     x_offset = 0   # Determine the starting position of each energy level line on the plot
+    #     line_length = 0.2  # Set the length of each energy level line
 
     #     for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
-    #         if prev_energy is not None and torch.abs(torch.tensor(energy) - torch.tensor(prev_energy)) < tolerance:
-    #             pass 
-    #         else:
-    #             x_offset = 0
-
-    #         plt.hlines(energy, xmin=x_offset, xmax=0.1 + x_offset, color='blue')  
+    #         plt.hlines(energy, xmin=x_offset, xmax=x_offset + line_length, color='blue')  
     #         prev_energy = energy 
-    #         x_offset += 0.3  
 
-    #     plt.margins(x=3)
     #     plt.xlabel('Energy Levels') 
     #     plt.ylabel('Energy (eV)')
     #     plt.title(f'Energy Levels of {molecule_name}')
