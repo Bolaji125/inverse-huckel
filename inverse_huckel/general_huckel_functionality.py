@@ -36,13 +36,13 @@ class MolecularSystem:
         H = torch.from_numpy(H)
         # Perform eigenvalue decomposition using PyTorch
         eigenvalues_complex, eigenvectors = torch.linalg.eig(H)
-
-        print("Shape of eigenvalues_complex:", eigenvalues_complex)  # Print the shape of eigenvalues_complex
+        #eigenvalues_complex = torch.linalg.eigvals(H)
                 
         # Extract the real part of eigenvalues
-        eigenvalues_real = eigenvalues_complex.numpy()
+        #eigenvalues_real = eigenvalues_complex.numpy()
+        eigenvalues_real = eigenvalues_complex.real
 
-        return eigenvalues_real
+        return eigenvalues_real, eigenvectors
     
     def plot_molecular_orbitals(self, coordinates,i, molecule_name = "Molecule"):
         energies, wavefunctions = self.solve_eigenvalue_problem()
@@ -52,7 +52,6 @@ class MolecularSystem:
         fig = plt.figure()
         # Draw lines for pairs of atoms with short distances
         self.draw_short_distance_lines(coordinates) #calling the method below
-
 
         circle_sizes = np.abs(wavefunctions[:, i]) * 5000
         colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
@@ -76,6 +75,31 @@ class MolecularSystem:
                 if distance <= threshold_distance:
                     plt.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], 'k-')
 
+    def plot_molecular_orbitals_pytorch(self, coordinates, i, molecule_name="Molecule"):
+        energies, wavefunctions = self.solve_eigenvalue_problem_pytorch()
+
+        fig = plt.figure()
+        # Draw lines for pairs of atoms with short distances
+        self.draw_short_distance_lines(coordinates)
+
+        circle_sizes = torch.abs(wavefunctions[:, i]) * 5000  # Use absolute value of the corresponding wavefunctions
+        # Extract the real part of wavefunctions
+        real_wavefunctions = wavefunctions[:, i].real
+        # Use real part for color instead of direct comparison
+        colors = ['green' if val >= 0 else 'red' for val in real_wavefunctions]
+        for j in range(len(coordinates)):
+            plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
+
+        plt.xlabel('X / $\AA$')
+        plt.ylabel('Y / $\AA$')
+        plt.title(f'Molecular Orbital {i+1} of {molecule_name}')
+        plt.axis('equal')
+        plt.grid(True)
+        file_name = f'Molecular Orbital {i+1} of {molecule_name}_pytorch.pdf'
+        file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+        plt.show()
+
+
     def plot_energy_levels(self, energies, molecule_name="Molecule"):
         #print("Energies:", [f"{energy:.16f}" for energy in energies])  # Print the energies with full precision
         prev_energy = None #initialises previous enegy to none. it is used to keep track of the previous energy while iterating through the list of energies.
@@ -94,7 +118,7 @@ class MolecularSystem:
             x_offset += 0.3  # Increase the x offset for every plotted line
         
         plt.margins(x=3)
-        plt.xlabel('Energy Levels') #is this label ok?
+        plt.xlabel('Energy Levels') 
         plt.ylabel('Energy (eV)')
         plt.title(f'Energy Levels of {molecule_name}')
 
@@ -106,6 +130,85 @@ class MolecularSystem:
         plt.savefig(file_path)
 
         plt.show()
+
+    def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"):
+        eigenvalues, _ = energies  # Unpack the tuple and ignore the second element
+        
+        # Convert eigenvalues to a PyTorch tensor
+        eigenvalues = torch.tensor(eigenvalues).clone().detach()
+
+        # Group unique eigenvalues and their counts
+        unique_eigenvalues, counts = torch.unique(eigenvalues, return_counts=True)
+
+        prev_x_offset = 0  # Initialize variable to keep track of the starting position of each energy level line
+
+        for energy, count in zip(unique_eigenvalues.numpy(), counts.numpy()):
+            # Calculate x_offsets with spacing between degenerate energy levels
+            x_offset = prev_x_offset
+            for _ in range(count):
+                # Extend the line length to 0.5 for better visibility
+                plt.hlines(energy, xmin=x_offset, xmax=x_offset + 0.8, color='blue')
+                x_offset += 1.5  # Adjust the spacing between lines to make them appear bigger
+            
+            prev_x_offset = x_offset + 0.5  # Increase the offset for the next group of lines
+
+        plt.margins(x=3)
+        plt.xlabel('Energy Levels') 
+        plt.ylabel('Energy (eV)')
+        plt.title(f'Energy Levels of {molecule_name}')
+        plt.xlim(0, x_offset + 1)
+        plt.show()
+
+    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"):
+    #     eigenvalues, _ = energies  # Unpack the tuple and ignores the second element. why do we need to type _ then??????
+    #     eigenvalues = torch.tensor(eigenvalues).clone().detach()
+
+    #     # Group unique eigenvalues and their counts
+    #     unique_eigenvalues, counts = torch.unique(eigenvalues, return_counts=True) #finds uniquw elements in the eigenvalues tensor anf their respective counts.return counts = tru means we want to get the counts of each unique element
+
+    #     prev_x_offset = 0 #initialise variable to keep track of the starting position of each energy level line
+
+    #     for energy, count in zip(unique_eigenvalues.numpy(), counts.numpy()): #?????this loop iterates over each unique eigenvalue and its count. unique_eigenvalues and counts tensors converted to NumPy arrays and iterate over them simultaneously using zip.
+    #         x_offsets = np.linspace(prev_x_offset, prev_x_offset + 0.1, count, endpoint=False)
+    #         for x_offset in x_offsets:
+    #             plt.hlines(energy, xmin=x_offset, xmax=x_offset + 0.3, color='blue')
+    #         prev_x_offset += 0.5
+
+    #     plt.margins(x=3)
+    #     plt.xlabel('Energy Levels') 
+    #     plt.ylabel('Energy (eV)')
+    #     plt.title(f'Energy Levels of {molecule_name}')
+    #     plt.show()
+
+    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"):
+    #     eigenvalues, _ = energies  # Unpack the tuple
+    #     #eigenvalues = torch.tensor(eigenvalues)  # Convert eigenvalues to a PyTorch tensor
+    #     eigenvalues = torch.tensor(eigenvalues).clone().detach()
+    #     print("eigenvalues", eigenvalues)
+
+    #     prev_energy = None 
+    #     x_offset = 0  
+    #     tolerance = 1e-4
+
+    #     for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
+    #         if prev_energy is not None and torch.abs(torch.tensor(energy) - torch.tensor(prev_energy)) < tolerance:
+    #             pass 
+    #         else:
+    #             x_offset = 0
+
+    #         plt.hlines(energy, xmin=x_offset, xmax=0.1 + x_offset, color='blue')  
+    #         prev_energy = energy 
+    #         x_offset += 0.3  
+
+    #     plt.margins(x=3)
+    #     plt.xlabel('Energy Levels') 
+    #     plt.ylabel('Energy (eV)')
+    #     plt.title(f'Energy Levels of {molecule_name}')
+    #     plt.show()
+
+    
+
+    
 # Define the directory where you want to save the file
 # directory = 'Documents/GitHub/inverse-huckel.git/inverse_huckel'
 
