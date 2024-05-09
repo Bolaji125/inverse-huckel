@@ -2,28 +2,56 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import torch
+from matplotlib import cm
 
 class MolecularSystem:
+    # def __init__(self, coordinates, alpha, beta, cutoff_distance): #original code
+    #     self.coordinates = coordinates
+    #     self.alpha = alpha
+    #     self.beta = beta
+    #     self.cutoff_distance = cutoff_distance
+    #     self.H = self.construct_hamiltonian()
+
+
     def __init__(self, coordinates, alpha, beta, cutoff_distance):
         self.coordinates = coordinates
-        self.alpha = alpha
+        self.alpha = torch.tensor(alpha, requires_grad=True)
         self.beta = beta
         self.cutoff_distance = cutoff_distance
-        self.H = self.construct_hamiltonian()
+        self.H = self.construct_hamiltonian().detach() #???
 
+    # def calculate_distance(self, atom_i, atom_j): #original code
+    #     return np.linalg.norm(atom_i - atom_j)
+    
+    
     def calculate_distance(self, atom_i, atom_j):
-        return np.linalg.norm(atom_i - atom_j)
+        atom_i_tensor = torch.tensor(atom_i)
+        atom_j_tensor = torch.tensor(atom_j)
+        return torch.linalg.norm(atom_i_tensor - atom_j_tensor)
 
+    # def construct_hamiltonian(self): #original code
+    #     n = len(self.coordinates)
+    #     H = np.zeros((n, n))
+    #     for i in range(n):
+    #         for j in range(i + 1, n):
+    #             distance_ij = self.calculate_distance(self.coordinates[i], self.coordinates[j])
+    #             if distance_ij < self.cutoff_distance:
+    #                 H[i, j] = self.beta
+    #                 H[j, i] = self.beta
+    #     np.fill_diagonal(H, self.alpha)
+    #     return H
+    
     def construct_hamiltonian(self):
         n = len(self.coordinates)
-        H = np.zeros((n, n))
+        H = torch.zeros((n, n))  # create a new tensor for H
         for i in range(n):
             for j in range(i + 1, n):
                 distance_ij = self.calculate_distance(self.coordinates[i], self.coordinates[j])
                 if distance_ij < self.cutoff_distance:
                     H[i, j] = self.beta
                     H[j, i] = self.beta
-        np.fill_diagonal(H, self.alpha)
+        H.fill_diagonal_(self.alpha.item())  # Fill diagonal with scalar value of alpha
+
         return H
 
     def solve_eigenvalue_problem(self):
@@ -31,18 +59,25 @@ class MolecularSystem:
         #print (np.linalg.eigh(self.H))
         return np.linalg.eigh(self.H)
     
-    def solve_eigenvalue_problem_pytorch(self):
-        H = self.construct_hamiltonian()
-        H = torch.from_numpy(H)
-        # Perform eigenvalue decomposition using PyTorch
-        eigenvalues_complex, eigenvectors = torch.linalg.eig(H)
-        #eigenvalues_complex = torch.linalg.eigvals(H)
+    
+    
+    # def solve_eigenvalue_problem_pytorch(self): #original code
+    #     H = self.construct_hamiltonian()
+    #     H = torch.from_numpy(H)
+    #     # Perform eigenvalue decomposition using PyTorch
+    #     eigenvalues_complex, eigenvectors = torch.linalg.eig(H)
+    #     #eigenvalues_complex = torch.linalg.eigvals(H)
                 
-        # Extract the real part of eigenvalues
-        #eigenvalues_real = eigenvalues_complex.numpy()
-        eigenvalues_real = eigenvalues_complex.real
-
-        return eigenvalues_real, eigenvectors
+    #     # Extract the real part of eigenvalues
+    #     #eigenvalues_real = eigenvalues_complex.numpy()
+    #     eigenvalues_real = eigenvalues_complex.real
+    
+    #     return eigenvalues_real, eigenvectors
+    
+    def solve_eigenvalue_problem_pytorch(self):
+        eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
+        return eigenvalues, eigenvectors
+       
     
     def plot_molecular_orbitals(self, coordinates,i, molecule_name = "Molecule"):
         energies, wavefunctions = self.solve_eigenvalue_problem()
@@ -158,6 +193,45 @@ class MolecularSystem:
         plt.title(f'Energy Levels of {molecule_name}')
         plt.show()
 
+
+        
+    # def compute_gradient_with_respect_to_eigenvalues(self): #diff loss function
+    #     eigenvalues, _ = self.solve_eigenvalue_problem() #retrieves the eigenvalues and ignores the eigenvectors
+    #     eigenvalues_tensor = torch.tensor(eigenvalues, requires_grad=True)  # Convert eigenvalues to a PyTorch tensor. gradients should be computed with respect to the eigenvalues, this tensor
+    #     loss = torch.sum(eigenvalues_tensor)  # Example loss function (sum of eigenvalues)
+    #     loss.backward()  # Compute gradient of loss function, backpropapagation
+    #     if eigenvalues_tensor.grad is not None:  # Check if gradients exist
+    #         return eigenvalues_tensor.grad
+    #     else:
+    #         raise RuntimeError("Gradient computation failed.")
+
+
+    def compute_gradient_with_respect_to_eigenvalues(self, target_eigenvalues):
+        eigenvalues, _ = self.solve_eigenvalue_problem_pytorch()
+        eigenvalues_tensor = torch.tensor(eigenvalues, requires_grad=True)  # Convert eigenvalues to a PyTorch tensor
+        print(eigenvalues.grad)
+        mse_loss = torch.nn.functional.mse_loss(eigenvalues_tensor, torch.tensor(target_eigenvalues))
+        mse_loss.backward()  # Compute gradient of MSE loss function
+        if eigenvalues_tensor.grad is not None:  # Check if gradients exist
+            return eigenvalues_tensor.grad
+        else:
+            raise RuntimeError("Gradient computation failed.")
+    
+
+    def visualise_gradient(self, target_eigenvalues, molecule_name = "Molecule" ):
+        eigenvalues_gradient = self.compute_gradient_with_respect_to_eigenvalues(target_eigenvalues) #line computes the gradient
+        print("eigenvalues gradient:", eigenvalues_gradient)
+        cmap = cm.coolwarm  # Define the colormap which colours the bars in the bar plot
+        plt.bar(np.arange(len(eigenvalues_gradient)), eigenvalues_gradient, color=cmap(eigenvalues_gradient))  # Use the colormap
+        plt.xticks(np.arange(len(eigenvalues_gradient)), np.arange(len(eigenvalues_gradient)))  # Adjust the x-axis ticks
+        plt.xlabel('Eigenvalue')
+        plt.ylabel('Gradient')
+        plt.title( f'Gradient of Hamiltonian {molecule_name} with Respect to Eigenvalues')
+        plt.show()
+        
+    
+
+
     # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #doesn't work correctly as 5 levels instead of 6.
     #     eigenvalues, _ = energies  # Unpack the tuple
     #     eigenvalues = torch.tensor(eigenvalues).clone().detach()
@@ -182,7 +256,7 @@ class MolecularSystem:
     #     plt.title(f'Energy Levels of {molecule_name}')
     #     plt.show()
 
-    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #works but doesn't look right. see week 3 notes for logic.
+    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #works but doesn't look right. see week 3 notes for logic i should follow.
     #     eigenvalues, _ = energies  # Unpack the tuple
     #     eigenvalues = torch.tensor(eigenvalues).clone().detach()
 
