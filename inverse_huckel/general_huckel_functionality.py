@@ -13,12 +13,19 @@ class MolecularSystem:
     #     self.H = self.construct_hamiltonian()
 
 
+    # def __init__(self, coordinates, alpha, beta, cutoff_distance): #derivative code that isn't correct
+    #     self.coordinates = coordinates
+    #     self.alpha = torch.tensor(alpha, requires_grad=True)
+    #     self.beta = beta
+    #     self.cutoff_distance = cutoff_distance
+    #     self.H = self.construct_hamiltonian().detach() #???
+
     def __init__(self, coordinates, alpha, beta, cutoff_distance):
         self.coordinates = coordinates
-        self.alpha = torch.tensor(alpha, requires_grad=True)
+        self.alpha = torch.tensor(alpha)
         self.beta = beta
         self.cutoff_distance = cutoff_distance
-        self.H = self.construct_hamiltonian().detach() #???
+        self.H = self.construct_hamiltonian()
 
     # def calculate_distance(self, atom_i, atom_j): #original code
     #     return np.linalg.norm(atom_i - atom_j)
@@ -194,40 +201,57 @@ class MolecularSystem:
         plt.show()
 
 
-        
-    # def compute_gradient_with_respect_to_eigenvalues(self): #diff loss function
-    #     eigenvalues, _ = self.solve_eigenvalue_problem() #retrieves the eigenvalues and ignores the eigenvectors
-    #     eigenvalues_tensor = torch.tensor(eigenvalues, requires_grad=True)  # Convert eigenvalues to a PyTorch tensor. gradients should be computed with respect to the eigenvalues, this tensor
-    #     loss = torch.sum(eigenvalues_tensor)  # Example loss function (sum of eigenvalues)
-    #     loss.backward()  # Compute gradient of loss function, backpropapagation
+
+    # def compute_gradient_with_respect_to_eigenvalues(self, target_eigenvalues): #derivative code that isn't correct
+    #     eigenvalues, _ = self.solve_eigenvalue_problem_pytorch()
+    #     eigenvalues_tensor = torch.tensor(eigenvalues, requires_grad=True)  # Convert eigenvalues to a PyTorch tensor
+    #     print(eigenvalues.grad)
+    #     mse_loss = torch.nn.functional.mse_loss(eigenvalues_tensor, torch.tensor(target_eigenvalues))
+    #     mse_loss.backward()  # Compute gradient of MSE loss function
     #     if eigenvalues_tensor.grad is not None:  # Check if gradients exist
     #         return eigenvalues_tensor.grad
     #     else:
     #         raise RuntimeError("Gradient computation failed.")
-
-
-    def compute_gradient_with_respect_to_eigenvalues(self, target_eigenvalues):
-        eigenvalues, _ = self.solve_eigenvalue_problem_pytorch()
-        eigenvalues_tensor = torch.tensor(eigenvalues, requires_grad=True)  # Convert eigenvalues to a PyTorch tensor
-        print(eigenvalues.grad)
-        mse_loss = torch.nn.functional.mse_loss(eigenvalues_tensor, torch.tensor(target_eigenvalues))
-        mse_loss.backward()  # Compute gradient of MSE loss function
-        if eigenvalues_tensor.grad is not None:  # Check if gradients exist
-            return eigenvalues_tensor.grad
-        else:
-            raise RuntimeError("Gradient computation failed.")
     
 
-    def visualise_gradient(self, target_eigenvalues, molecule_name = "Molecule" ):
-        eigenvalues_gradient = self.compute_gradient_with_respect_to_eigenvalues(target_eigenvalues) #line computes the gradient
-        print("eigenvalues gradient:", eigenvalues_gradient)
-        cmap = cm.coolwarm  # Define the colormap which colours the bars in the bar plot
-        plt.bar(np.arange(len(eigenvalues_gradient)), eigenvalues_gradient, color=cmap(eigenvalues_gradient))  # Use the colormap
-        plt.xticks(np.arange(len(eigenvalues_gradient)), np.arange(len(eigenvalues_gradient)))  # Adjust the x-axis ticks
-        plt.xlabel('Eigenvalue')
-        plt.ylabel('Gradient')
-        plt.title( f'Gradient of Hamiltonian {molecule_name} with Respect to Eigenvalues')
+    # def visualise_gradient(self, target_eigenvalues, molecule_name = "Molecule" ): #derivative code that isn't correct
+    #     eigenvalues_gradient = self.compute_gradient_with_respect_to_eigenvalues(target_eigenvalues) #line computes the gradient
+    #     print("eigenvalues gradient:", eigenvalues_gradient)
+    #     cmap = cm.coolwarm  # Define the colormap which colours the bars in the bar plot
+    #     plt.bar(np.arange(len(eigenvalues_gradient)), eigenvalues_gradient, color=cmap(eigenvalues_gradient))  # Use the colormap
+    #     plt.xticks(np.arange(len(eigenvalues_gradient)), np.arange(len(eigenvalues_gradient)))  # Adjust the x-axis ticks
+    #     plt.xlabel('Eigenvalue')
+    #     plt.ylabel('Gradient')
+    #     plt.title( f'Gradient of Hamiltonian {molecule_name} with Respect to Eigenvalues')
+    #     plt.show()
+    
+    def compute_derivative_matrix_with_respect_to_eigenvalues(self):
+        eigenvalues, eigenvectors = self.solve_eigenvalue_problem_pytorch()
+        print("eigenvalues:", eigenvalues)
+        n = len(eigenvalues)
+        D = torch.zeros(n, n, n, n)
+        for i in range(n):
+            for j in range(n):
+                #D[i, j] = eigenvectors[:, i] * eigenvectors[:, j].unsqueeze(0)
+                D[i, j] = eigenvectors[:, i].unsqueeze(1) @ eigenvectors[:, j].unsqueeze(0)
+        return D
+    
+    def visualise_matrices(self):
+        derivative_matrices = self.compute_derivative_matrix_with_respect_to_eigenvalues()
+        n = len(derivative_matrices) # calculates the size of derivative matrices list, which represent the number of derivative matrices
+
+        fig, axs = plt.subplots(n, n, figsize=(10, 10)) # creates a grid of subplots with dimensions n by n. it returns a figure and an array of axes. figsize sets the size of the figure 
+
+        for i in range(n): # this line iterates over the rows of the grid, i represents the rowns of the grid, n is the size of the grid(the no of rows or columsn)
+            for j in range(n): # this line iterates over the columns of the grid
+                axs[i, j].imshow(derivative_matrices[i, j], cmap='viridis') # displays the i, j-th matrix
+                axs[i, j].set_title(f'Derivative Matrix {i+1}, {j+1}', fontsize=8, pad=2) # line sets the title of the subplot at position i, j to indicate the index of the derivative matrix.
+
+        plt.tight_layout() # This line adjusts the spacing between subplots to make sure they fit nicely in the figure.
         plt.show()
+    
+    
+       
         
     
 
