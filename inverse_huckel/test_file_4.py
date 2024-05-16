@@ -30,7 +30,6 @@ class MolecularSystem:
         
         # Set off-diagonal elements based on distance and beta
         for i in range(num_atoms):
-            #for j in range(i + 1, num_atoms):
             for j in range(num_atoms):  # Iterate over all atoms
                 if i != j:  # Skip diagonal elements, as they are alpha parameters
                     distance = torch.norm(self.coordinates[i] - self.coordinates[j])
@@ -42,11 +41,54 @@ class MolecularSystem:
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         return eigenvalues, eigenvectors
 
-# Optimization loop with target alpha and beta parameters
+# Function for optimization loop
+def optimize_molecular_system(molecular_system, target_eigenvalues, num_iterations=1000, learning_rate=0.01):
+    # Learning rate
+    eigenvalues, _ = molecular_system.solve_eigenvalue_problem_pytorch()
+    print("eigenvalues before optimization:", eigenvalues)
+    print("hamiltonian:", molecular_system.H)
+
+    # Optimization loop
+    for i in range(num_iterations + 1):
+        molecular_system.update_hamiltonian()
+        eigenvalues, _ = molecular_system.solve_eigenvalue_problem_pytorch()
+
+        # Calculate loss based on the difference between current and target eigenvalues
+        loss = F.mse_loss(eigenvalues, target_eigenvalues)
+        if i % 500 == 0 or i == num_iterations:  # Print every 100 iterations
+            print(f"Iteration {i}, Loss: {loss.item()}")
+
+        if i < num_iterations:  # Only perform gradient descent for the first num_iterations iterations
+            loss.backward()
+
+
+
+        with torch.no_grad():
+            molecular_system.alpha -= learning_rate * molecular_system.alpha.grad
+            molecular_system.beta -= learning_rate * molecular_system.beta.grad
+
+        molecular_system.alpha.grad.zero_()
+        molecular_system.beta.grad.zero_()
+
+    # Print the optimized alpha and beta values and resulting Hamiltonian and eigenvalues
+    print("Optimized Alpha Values:", molecular_system.alpha)
+    print("Optimized Beta Values:", molecular_system.beta)
+    print("Optimized Hamiltonian:", molecular_system.H)
+    eigenvalues_after, _ = molecular_system.solve_eigenvalue_problem_pytorch()
+    print("Eigenvalues after optimization:", eigenvalues_after.real)
+
+# Constants
 alpha_initial = -10.0
 beta_initial = -1.0
 cutoff_distance = 2.0
 
+# Define target eigenvalues for benzene
+target_eigenvalues_benzene = torch.tensor([-13.0, -12.0, -10.0, -10.0, -10.0, -9.0], dtype=torch.float32, requires_grad=False)
+
+# Define target eigenvalues for napthalene
+target_eigenvalues_napthalene = torch.tensor([-13.0, -12.0, -11.5, -12.5, -11.0, -10.5, -10.0, -9.0, -9.5, -8.0], dtype=torch.float32, requires_grad=False)  # Add your target eigenvalues for napthalene here
+
+# Benzene coordinates
 benzene_coordinates = np.array([
     [-4.461121, 1.187057, -0.028519],
     [-3.066650, 1.263428, -0.002700],
@@ -56,44 +98,30 @@ benzene_coordinates = np.array([
     [-5.092743, -0.058655, -0.010193]
 ])
 
-# Define the target alpha and beta parameters
-target_alpha_parameters = torch.tensor([-9.0, -9.1, -9.2, -9.3, -9.4, -9.5], requires_grad=False)
-target_beta_parameters = torch.tensor([-0.9, -0.95, -1.0, -1.05, -1.1, -1.15], requires_grad=False)
+# Napthalene coordinates
+napthalene_coordinates = np.array([
+    [ 1.24593,1.40391, -0.0000],
+    [0.00001, 0.71731, -0.00000],
+    [-0.00000, -0.71730, -0.00000],
+    [1.24592, -1.40388, -0.00000],
+    [2.43659, -0.70922, -0.00000],
+    [2.43659, 0.70921, 0.00000],
+    [-1.24593, -1.40387, 0.00000],
+    [-2.43660, -0.70921, 0.00000],
+    [-2.43660, 0.70921, 0.00000],
+    [-1.24592, 1.40390, -0.00000],
+])
 
-# Create molecular system instance
+# Create molecular system instances
 molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha_initial, beta_initial, cutoff_distance)
+molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
 
-# Set initial alpha and beta values
-molecular_system_benzene.alpha = torch.tensor([-10.0, -10.0, -10.0, -10.0, -10.0, -10.0], requires_grad=True)
-molecular_system_benzene.beta = torch.tensor([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0], requires_grad=True)
+# Optimize molecular systems
+optimize_molecular_system(molecular_system_benzene, target_eigenvalues_benzene)
+optimize_molecular_system(molecular_system_napthalene, target_eigenvalues_napthalene)
 
-# Learning rate
-learning_rate = 0.01
-eigenvalues, _ = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
-print("eigenvalues before optimisation:", eigenvalues)
-print("hamiltonian:",molecular_system_benzene.H )
-# Optimization loop
-for i in range(2000):
-    molecular_system_benzene.update_hamiltonian()
-    eigenvalues, _ = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
 
-    # Calculate loss based on the difference between current alpha and beta parameters and target parameters
-    loss_alpha = F.mse_loss(molecular_system_benzene.alpha, target_alpha_parameters)
-    loss_beta = F.mse_loss(molecular_system_benzene.beta, target_beta_parameters)
-    loss = loss_alpha + loss_beta
 
-    loss.backward()
 
-    with torch.no_grad():
-        molecular_system_benzene.alpha -= learning_rate * molecular_system_benzene.alpha.grad
-        molecular_system_benzene.beta -= learning_rate * molecular_system_benzene.beta.grad
 
-    molecular_system_benzene.alpha.grad.zero_()
-    molecular_system_benzene.beta.grad.zero_()
 
-# Print the optimized alpha and beta values and resulting Hamiltonian and eigenvalues
-print("Optimized Alpha Values:", molecular_system_benzene.alpha)
-print("Optimized Beta Values:", molecular_system_benzene.beta)
-print("Optimized Hamiltonian:", molecular_system_benzene.H)
-eigenvalues_after, _ = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
-print("Eigenvalues after optimization:", eigenvalues_after.real)

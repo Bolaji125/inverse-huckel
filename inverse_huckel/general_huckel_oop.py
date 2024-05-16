@@ -32,14 +32,14 @@ molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha, beta, cut
 #print("benzene", energies_benzene)
 
 #obtain energy
-# energies_pytorch = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
+energies_pytorch = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
 
 # # plot molecular orbitals - pytorch
 # molecular_system_benzene.plot_molecular_orbitals_pytorch(benzene_coordinates, 0, "Benzene")
 
 # #plot energy levels - pytorch
-# molecular_system_benzene.plot_energy_levels_pytorch(energies_pytorch, "Benzene")
-# print("energies", energies_pytorch)
+molecular_system_benzene.plot_energy_levels_pytorch(energies_pytorch, "Benzene")
+print("benzene energies", energies_pytorch)
 
 # target eigenvalues- example
 # target_eigenvalues_benzene = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
@@ -50,13 +50,13 @@ molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha, beta, cut
 # molecular_system_benzene.visualise_gradient(target_eigenvalues_benzene, "Benzene")
 
 # compute derivative matrix with respect to eigenvalues, this way round or???
-derivative_matrix_benzene = molecular_system_benzene.compute_derivative_matrix_with_respect_to_eigenvalues()
-print("Derivative matrix benzene with respect to eigenvalues:", derivative_matrix_benzene)
+# derivative_matrix_benzene = molecular_system_benzene.compute_derivative_matrix_with_respect_to_eigenvalues()
+# print("Derivative matrix benzene with respect to eigenvalues:", derivative_matrix_benzene)
 #print("Number of matrices returned for Benzene:", derivative_matrix_benzene.size(0))
 
 # Visualize matrices for Benzene
 #print("Visualising matrices for Benzene:")
-molecular_system_benzene.visualise_matrices()
+#molecular_system_benzene.visualise_matrices()
 
 
 #napthalene
@@ -81,20 +81,20 @@ molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha, bet
 # molecular_system_napthalene.plot_molecular_orbitals(napthalene_coordinates,9, "Napthalene")
 
 # obtain energy
-# energies_napthalene = molecular_system_napthalene.solve_eigenvalue_problem()[0]
-# print("energies napthalene:", energies_napthalene)
+energies_napthalene = molecular_system_napthalene.solve_eigenvalue_problem()[0]
+print("energies napthalene:", energies_napthalene)
 
 # plot energy levels
 #molecular_system_napthalene.plot_energy_levels(energies_napthalene, "Napthalene")
 
 #obtain energy - pytorch
-#energies_pytorch = molecular_system_napthalene.solve_eigenvalue_problem_pytorch()
+energies_pytorch = molecular_system_napthalene.solve_eigenvalue_problem_pytorch()
 
 #plot molecular orbitals- pytorch
 # #molecular_system_napthalene.plot_molecular_orbitals_pytorch(napthalene_coordinates, 0, "Napthalene")
 
 #plot energy levels-pytorch
-#molecular_system_napthalene.plot_energy_levels_pytorch(energies_pytorch, "Napthalene")
+molecular_system_napthalene.plot_energy_levels_pytorch(energies_pytorch, "Napthalene")
 
 # target eigenvalues- example
 # target_eigenvalues_napthalene = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
@@ -105,7 +105,7 @@ molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha, bet
 # molecular_system_napthalene.visualise_gradient(target_eigenvalues_napthalene, "Napthalene")
 
 # compute derivative matrix with respect to eigenvalues
-derivative_matrix_napthalene = molecular_system_napthalene.compute_derivative_matrix_with_respect_to_eigenvalues()
+#derivative_matrix_napthalene = molecular_system_napthalene.compute_derivative_matrix_with_respect_to_eigenvalues()
 #print("Derivative matrix napthalene with respect to eigenvalues:", derivative_matrix_napthalene)
 #print("Number of matrices returned for Napthalene:", derivative_matrix_napthalene.size(0))
 

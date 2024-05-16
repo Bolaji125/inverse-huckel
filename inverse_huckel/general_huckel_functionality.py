@@ -162,7 +162,7 @@ class MolecularSystem:
         plt.margins(x=3)
         plt.xlabel('Energy Levels') 
         plt.ylabel('Energy (eV)')
-        plt.title(f'Energy Levels of {molecule_name}')
+        plt.title(f'Energy Levels of {molecule_name} using NumPy')
 
          # Define the file path and name based on the molecule name
         file_name = f"{molecule_name.replace(' ', '_')}_energy_levels.pdf"
@@ -174,32 +174,38 @@ class MolecularSystem:
         plt.show()
 
 
-    def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #works but benezene energy level ver small.doesn't work for napthalene
-        eigenvalues, _ = energies  # Unpack the tuple, _ is a paceholder to ignore the second element of the tuple as it is not needed
-        #eigenvalues = torch.tensor(eigenvalues)  # Convert eigenvalues to a PyTorch tensor
+    def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"):
+        eigenvalues, _ = energies  # Unpack the tuple, _ is a placeholder to ignore the second element of the tuple as it is not needed
         eigenvalues = eigenvalues.clone().detach()
         print("eigenvalues", eigenvalues)
 
-        prev_energy = None #keeps track of previous energy level
-        x_offset = 0   #determines the starting position of each energy level line on the plot
-        #tolerance = 1e-4 #tolerance determines if two energy levels are considered degenerate
+        prev_energy = None  # keeps track of the previous energy level
+        x_offset = 0  # determines the starting position of each energy level line on the plot
+        tolerance = 1e-6  # tolerance to determine if two energy levels are degenerate
 
         for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
-            # if prev_energy is not None and torch.abs(torch.tensor(energy) - torch.tensor(prev_energy)) < tolerance:
-            #     pass 
-            # else:
-            #     x_offset = 0
+            if prev_energy is not None and abs(energy - prev_energy) < tolerance:
+                x_offset += 0.3  # Increase the x offset to add whitespace for degenerate levels
+            else:
+                x_offset = 0  # Reset x offset for non-degenerate energy levels
 
             plt.hlines(energy, xmin=x_offset, xmax=0.3 + x_offset, color='blue')  
-            prev_energy = energy 
-            x_offset += 0.5  #line determines energy spacing between consecutive energy levels
+            prev_energy = energy  # Update the previous energy level
+            x_offset += 0.5  # Add spacing between consecutive energy levels
 
         plt.margins(x=3)
         plt.xlabel('Energy Levels') 
         plt.ylabel('Energy (eV)')
-        plt.title(f'Energy Levels of {molecule_name}')
-        plt.show()
+        plt.title(f'Energy Levels of {molecule_name} using PyTorch')
+        
+        # Define the file path and name based on the molecule name
+        # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels.pdf"
+        # file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+        
+        # # Save the plot
+        # plt.savefig(file_path)
 
+        plt.show()
 
 
     # def compute_gradient_with_respect_to_eigenvalues(self, target_eigenvalues): #derivative code that isn't correct
@@ -252,52 +258,6 @@ class MolecularSystem:
     
     
        
-        
-    
-
-
-    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #doesn't work correctly as 5 levels instead of 6.
-    #     eigenvalues, _ = energies  # Unpack the tuple
-    #     eigenvalues = torch.tensor(eigenvalues).clone().detach()
-
-    #     prev_energy = None 
-    #     x_offset = 0   # Determine the starting position of each energy level line on the plot
-    #     spacing = 0.3  # Set the spacing between consecutive energy levels
-    #     degenerate_spacing = 0.1  # Set the additional spacing for degenerate energy levels
-
-    #     for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
-    #         if prev_energy is not None and energy == prev_energy:
-    #             x_offset += degenerate_spacing
-    #         else:
-    #             x_offset += spacing
-
-    #         plt.hlines(energy, xmin=x_offset, xmax=spacing + x_offset, color='blue')  
-    #         prev_energy = energy 
-
-    #     plt.margins(x=3)
-    #     plt.xlabel('Energy Levels') 
-    #     plt.ylabel('Energy (eV)')
-    #     plt.title(f'Energy Levels of {molecule_name}')
-    #     plt.show()
-
-    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): #works but doesn't look right. see week 3 notes for logic i should follow.
-    #     eigenvalues, _ = energies  # Unpack the tuple
-    #     eigenvalues = torch.tensor(eigenvalues).clone().detach()
-
-    #     prev_energy = None 
-    #     x_offset = 0   # Determine the starting position of each energy level line on the plot
-    #     line_length = 0.2  # Set the length of each energy level line
-
-    #     for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
-    #         plt.hlines(energy, xmin=x_offset, xmax=x_offset + line_length, color='blue')  
-    #         prev_energy = energy 
-
-    #     plt.xlabel('Energy Levels') 
-    #     plt.ylabel('Energy (eV)')
-    #     plt.title(f'Energy Levels of {molecule_name}')
-    #     plt.show()
-
-    
 
     
 # Define the directory where you want to save the file
