@@ -4,7 +4,7 @@ import os
 import torch
 import torch.nn.functional as F
 from matplotlib import cm
-
+#optimisation code applied to alpha and beta
 class MolecularSystem:
 
     def __init__(self, coordinates, alpha, beta, cutoff_distance):
@@ -83,7 +83,7 @@ beta_initial = -1.0
 cutoff_distance = 2.0
 
 # Define target eigenvalues for benzene
-target_eigenvalues_benzene = torch.tensor([-13.0, -12.0, -10.0, -10.0, -10.0, -9.0], dtype=torch.float32, requires_grad=False)
+target_eigenvalues_benzene = torch.tensor([-13.0, -12.0, -12.0, -9.0, -10.0, -9.0], dtype=torch.float32, requires_grad=False)
 
 # Define target eigenvalues for napthalene
 target_eigenvalues_napthalene = torch.tensor([-13.0, -12.0, -11.5, -12.5, -11.0, -10.5, -10.0, -9.0, -9.5, -8.0], dtype=torch.float32, requires_grad=False)  # Add your target eigenvalues for napthalene here
