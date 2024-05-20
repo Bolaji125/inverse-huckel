@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
-
+# code to visualise matrix
 # Create a 2x2 matrix
 matrix = torch.tensor([[3.0, 1.0],
                        [1.0, 4.0]], requires_grad=True)

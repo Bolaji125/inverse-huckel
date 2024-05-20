@@ -126,6 +126,54 @@ def plot_parameter_changes(alpha_history, beta_history, loss_history,molecule_na
     plt.subplots_adjust(hspace=0.6)  # Add space between subplots
     plt.show()
 
+def plot_molecule(coordinates, alpha_values, beta_values, molecule_name, cutoff_distance, ax = None):
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 8))
+
+    # plot atoms
+    for i in range(len(coordinates)): #iterates over each atom in the molecule
+        alpha = alpha_values[i].item() if isinstance(alpha_values[i], torch.Tensor) else alpha_values[i] # extracts the alpha value for the current atom. It checks if the alpha value is a PyTorch tensor and converts it to a Python scalar if necessary.
+        ax.scatter(coordinates[i, 0], coordinates[i, 1], s=1000 * abs(alpha), c='blue', alpha=0.5) # plots a scatter point for the current atom using its x and y coordinates. The size of the point is determined by the absolute value of its alpha value. Blue color and 50% transparency (alpha=0.5) are used.
+
+    # plot bonds
+    for i in range(len(coordinates)): # loop iterates over each pair of atoms in the molecule
+        for j in range(i + 1, len(coordinates)):
+            beta = beta_values[i].item() if isinstance(beta_values[i], torch.Tensor) else beta_values[i]
+            line_width = abs(beta) # calculates the line width based on the absolute value of the beta value.
+            distance = np.linalg.norm(coordinates[i] - coordinates[j]) # calculates the distance between the current atom and the neighboring atom using the Euclidean norm.
+            if distance <= cutoff_distance:
+                ax.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], # plots a line connecting the current atom to its neighboring atom. The line width is determined by the beta value, and the color is black with 50% transparency.
+                        linewidth=line_width, color='black', alpha=0.5)
+
+    ax.set_aspect('equal')
+    ax.set_title(f'Molecule Visualisation - {molecule_name}')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.grid(True)
+
+    if ax is None:
+        plt.show()
+
+def optimise_and_plot(molecular_system, target_eigenvalues, molecule_name, cutoff_distance):
+    fig, axs = plt.subplots(1, 2, figsize=(16, 8))
+    # Optimise the molecular system
+    alpha_history, beta_history, loss_history = optimise_molecular_system(molecular_system, target_eigenvalues)
+    # Plot before optimisation
+    plot_molecule(molecular_system.coordinates, alpha_history[0], beta_history[0],
+                  f"{molecule_name} - Before Optimisation", cutoff_distance, ax=axs[0])
+    
+    # Plot after optimisation
+    plot_molecule(molecular_system.coordinates, alpha_history[-1], beta_history[-1],
+                  f"{molecule_name} - After Optimisation", cutoff_distance, ax=axs[1])
+    # plot the changes graphs 
+    plot_parameter_changes(alpha_history, beta_history, loss_history, molecule_name)
+
+
+    
+    plt.show()
+
+
+
 alpha_initial = -10.0
 beta_initial = -1.0
 cutoff_distance = 2.0
@@ -155,19 +203,30 @@ napthalene_coordinates = np.array([
     [-1.24592, 1.40390, -0.00000],
 ])
 
-# create instance for each molecule
+# create instance for benzene
 molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha_initial, beta_initial, cutoff_distance)
-molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
+optimise_and_plot(molecular_system_benzene, target_eigenvalues_benzene, "Benzene", cutoff_distance)
+
+# create instance for napthalene
+#molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
+#optimise_and_plot(molecular_system_napthalene, target_eigenvalues_napthalene, "Naphthalene", cutoff_distance)
+
+# print initial alpha and beta values
+# print("Initial Alpha Values (Benzene):", molecular_system_benzene.alpha)
+# print("Initial Beta Values (Benzene):", molecular_system_benzene.beta)
+# print("Initial Alpha Values (Naphthalene):", molecular_system_napthalene.alpha)
+# print("Initial Beta Values (Naphthalene):", molecular_system_napthalene.beta)
 
 # optimise the molecular system
-alpha_history_benzene, beta_history_benzene, loss_history_benzene = optimise_molecular_system(molecular_system_benzene, target_eigenvalues_benzene)
-alpha_history_napthalene, beta_history_napthalene, loss_history_napthalene = optimise_molecular_system(molecular_system_napthalene, target_eigenvalues_napthalene)
+#alpha_history_benzene, beta_history_benzene, loss_history_benzene = optimise_molecular_system(molecular_system_benzene, target_eigenvalues_benzene)
 
-# plot the changes
-plot_parameter_changes(alpha_history_benzene, beta_history_benzene, loss_history_benzene, "Benzene")
+#alpha_history_napthalene, beta_history_napthalene, loss_history_napthalene = optimise_molecular_system(molecular_system_napthalene, target_eigenvalues_napthalene)
 
-plot_parameter_changes(alpha_history_napthalene, beta_history_napthalene, loss_history_napthalene, "Naphthalene")
-
+# print final alpha and beta values
+# print("Final Alpha Values (Benzene):", molecular_system_benzene.alpha)
+# print("Final Beta Values (Benzene):", molecular_system_benzene.beta)
+# print("Final Alpha Values (Naphthalene):", molecular_system_napthalene.alpha)
+# print("Final Beta Values (Naphthalene):", molecular_system_napthalene.beta)
 
 
 

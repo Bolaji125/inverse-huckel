@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
-
+# optimisation code on a 2x2 matrix 
 # Create a 2x2 matrix
 matrix = torch.tensor([[3.0, 1.0],
                        [1.0, 4.0]], requires_grad=True)
@@ -17,9 +17,8 @@ eigenvalues_real = eigenvalues.real
 print("eigenvalues before optimisation", eigenvalues_real)
 
 # Create an optimizer
-#optimizer = torch.optim.SGD([matrix], lr=0.1) #initialises the stochastic gradient descent (SGD) optimizer, which will be used to optimize the matrix parameters (matrix) with a learning rate of 0.1
+optimizer = torch.optim.SGD([matrix], lr=0.1) #initialises the stochastic gradient descent (SGD) optimizer, which will be used to optimize the matrix parameters (matrix) with a learning rate of 0.1
 
-learning_rate = 0.1
 
 # Optimization loop
 for i in range(5):  # Backpropagate many times
@@ -37,15 +36,13 @@ for i in range(5):  # Backpropagate many times
     print(f"Iteration {i+1}, Loss: {loss.item()}")
 
     # Zero gradients
-    #optimizer.zero_grad() #Before performing backpropagation, we need to zero out the gradients stored in the optimizer.
+    optimizer.zero_grad() #Before performing backpropagation, we need to zero out the gradients stored in the optimizer.
 
     # Backpropagate
     loss.backward()
 
-    gradients = matrix.grad
-    matrix = matrix.detach() - learning_rate * gradients
     # Update the matrix using the optimizer
-    #optimizer.step()
+    optimizer.step()
 
 # Print the optimized matrix
 print("Optimized Matrix:", matrix)
