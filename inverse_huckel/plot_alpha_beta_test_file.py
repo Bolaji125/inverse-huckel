@@ -16,8 +16,10 @@ class MolecularSystem:
                 distance = np.linalg.norm(coordinates[i] - coordinates[j])
                 if distance <= cutoff_distance:
                     self.beta_indices.append((i, j))
+        print("Length of beta indices:", len(self.beta_indices)) 
         
         self.beta = torch.tensor([beta] * len(self.beta_indices), requires_grad=True)
+        print("Length of beta tensor:", len(self.beta))
         self.H = torch.zeros((len(coordinates), len(coordinates)), dtype=torch.float32)
         self.update_hamiltonian()  # calls update hamiltonian to initialize the matrix
 
@@ -46,15 +48,25 @@ class MolecularSystem:
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         return eigenvalues, eigenvectors
 
-    
-def optimise_molecular_system(molecular_system, target_eigenvalues, num_iterations=1000, learning_rate=0.01):
+
+def optimise_molecular_system(molecular_system, target_eigenvalues, num_iterations=1000, learning_rate=0.1): # code works but may not be computing gradients correctly
     # optimise the molecular system's parameters to match target eigenvalues using gradient descent
     alpha_history, beta_history, loss_history = [], [], [] #initialises an empty list to store the history of alpha, beta and loss values at each iteration
     eigenvalues, _ = molecular_system.solve_eigenvalue_problem_pytorch()
     print("eigenvalues before optimisation:", eigenvalues)
     print("hamiltonian:", molecular_system.H)
 
+    alpha_history.append(molecular_system.alpha.clone().detach().numpy())
+    beta_history.append(molecular_system.beta.clone().detach().numpy()) 
+    loss = F.mse_loss(eigenvalues, target_eigenvalues)
+    loss_history.append(loss.item())
+
+
     for i in range(num_iterations + 1):
+        # Reset gradients to zero at the beginning of each iteration
+        #molecular_system.alpha.grad.zero_()
+        #molecular_system.beta.grad.zero_()
+
         molecular_system.update_hamiltonian() #updates hamiltonian matrix based on the current alpha and beta values
         eigenvalues, _ = molecular_system.solve_eigenvalue_problem_pytorch()
         loss = F.mse_loss(eigenvalues, target_eigenvalues) # Computes the mean squared error (MSE) loss between the calculated eigenvalues and the target eigenvalues.
@@ -128,33 +140,34 @@ def plot_parameter_changes(alpha_history, beta_history, loss_history, molecule_n
     axs[2].set_xlabel('Epochs')
     axs[2].set_ylabel('Loss')
     axs[2].set_title(f'Loss Changes for {molecule_name}')
-    axs[2].legend(loc='upper left', bbox_to_anchor=(1.02, 0.70))
+    axs[2].legend(loc='upper left', bbox_to_anchor=(1.02, 0.60))
     axs[2].grid(True)
 
     plt.subplots_adjust(right=0.75, hspace=0.6)
     plt.show()
 
-def plot_molecule(coordinates, alpha_values, beta_values, molecule_name, cutoff_distance, ax=None): # compare to other plotting function
-    if ax is None: # what is ax?
+def plot_molecule(coordinates, alpha_values, beta_values, molecule_name, cutoff_distance, ax=None, alpha_scale=500, beta_scale=15):
+    if ax is None:
         fig, ax = plt.subplots(figsize=(8, 8))
-
+   
+    # Plot atoms with updated alpha scaling
     for i in range(len(coordinates)):
         alpha = alpha_values[i].item() if isinstance(alpha_values[i], torch.Tensor) else alpha_values[i]
-        ax.scatter(coordinates[i, 0], coordinates[i, 1], s=1000 * abs(alpha), c='blue', alpha=0.5)
-        ax.annotate(f'α{i+1}={alpha:.2f}', (coordinates[i, 0], coordinates[i, 1]))
+        ax.scatter(coordinates[i, 0], coordinates[i, 1], s=alpha_scale * abs(alpha), c='blue', alpha=0.5)
+        ax.annotate(f'α{i+1}={alpha:.4f}', (coordinates[i, 0], coordinates[i, 1]))
 
+    # Plot bonds with updated beta scaling
     pair_idx = 0
     for i in range(len(coordinates)):
         for j in range(i + 1, len(coordinates)):
             distance = np.linalg.norm(coordinates[i] - coordinates[j])
             if distance <= cutoff_distance:
-                beta = beta_values[pair_idx].item() if isinstance(beta_values[pair_idx], torch.Tensor) else beta_values[pair_idx]
+                beta = beta_values[pair_idx].detach().numpy() if isinstance(beta_values[pair_idx], torch.Tensor) else beta_values[pair_idx]
                 ax.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]],
-                        linewidth=abs(beta), color='black', alpha=0.5)
+                        linewidth=beta_scale * abs(beta), color='grey', alpha=0.5)
                 midpoint = (coordinates[i] + coordinates[j]) / 2
-                ax.annotate(f'β={beta:.2f}', midpoint[:2])  # Extract only x and y coordinates for annotation
+                ax.annotate(f'β={beta:.4f}', midpoint[:2])
                 pair_idx += 1
-
     ax.set_aspect('equal')
     ax.set_title(f'Molecule Visualisation - {molecule_name}')
     ax.set_xlabel('X')
@@ -163,58 +176,68 @@ def plot_molecule(coordinates, alpha_values, beta_values, molecule_name, cutoff_
     if ax is None:
         plt.show()
 
-
 def optimise_and_plot(molecular_system, target_eigenvalues, molecule_name, cutoff_distance):
-    fig, axs = plt.subplots(1, 2, figsize=(16, 8))
+    # Optimise the molecular system
     alpha_history, beta_history, loss_history = optimise_molecular_system(molecular_system, target_eigenvalues)
     
+    # Plot before and after optimisation with updated scaling factors
     plot_molecule(molecular_system.coordinates, alpha_history[0], beta_history[0],
-                  f"{molecule_name} - Before Optimisation", cutoff_distance, ax=axs[0])
-    plot_molecule(molecular_system.coordinates, alpha_history[-1], beta_history[-1],
-                  f"{molecule_name} - After Optimisation", cutoff_distance, ax=axs[1])
+                  f"{molecule_name} - Before Optimisation", cutoff_distance, alpha_scale=500, beta_scale=15)
     
-    plot_parameter_changes(alpha_history, beta_history, loss_history, molecule_name, molecular_system.beta_indices)
+    plot_molecule(molecular_system.coordinates, alpha_history[-1], beta_history[-1],
+                  f"{molecule_name} - After Optimisation", cutoff_distance, alpha_scale=500, beta_scale=15)
     
     plt.show()
 
 
+if __name__=="__main__":
 
-alpha_initial = -10.0
-beta_initial = -1.0
-cutoff_distance = 2.0
+    alpha_initial = -1.0
+    beta_initial = -1.0
+    #cutoff_distance = 2.0
+    benzene_cutoff_distance = 1.0
+    napthalene_cutoff_distance = 1.5
 
-target_eigenvalues_benzene = torch.tensor([-13.0, -12.0, -12.0, -9.0, -10.0, -9.0], dtype=torch.float32, requires_grad=False)
-target_eigenvalues_napthalene = torch.tensor([-13.0, -12.0, -11.5, -12.5, -11.0, -10.5, -10.0, -9.0, -9.5, -8.0], dtype=torch.float32, requires_grad=False)
+    target_eigenvalues_benzene = torch.tensor([-13.0, -12.0, -12.0, -9.0, -10.0, -9.0], dtype=torch.float32, requires_grad=False)
+    target_eigenvalues_napthalene = torch.tensor([-13.0, -12.0, -11.5, -12.5, -11.0, -10.5, -10.0, -9.0, -9.5, -8.0], dtype=torch.float32, requires_grad=False)
 
-benzene_coordinates = np.array([
-    [-4.461121, 1.187057, -0.028519],
-    [-3.066650, 1.263428, -0.002700],
-    [-2.303848, 0.094131, 0.041626],
-    [-2.935547, -1.151550, 0.059845],
-    [-4.330048, -1.227982, 0.034073],
-    [-5.092743, -0.058655, -0.010193]
-])
+    # benzene_coordinates = np.array([
+    #     [-4.461121, 1.187057, -0.028519],
+    #     [-3.066650, 1.263428, -0.002700],
+    #     [-2.303848, 0.094131, 0.041626],
+    #     [-2.935547, -1.151550, 0.059845],
+    #     [-4.330048, -1.227982, 0.034073],
+    #     [-5.092743, -0.058655, -0.010193]
+    # ])
+    benzene_coordinates = np.array([
+        [1.0, 0.0, 0.0],
+        [0.5, np.sqrt(3)/2, 0.0],
+        [-0.5, np.sqrt(3)/2, 0.0],
+        [-1.0, 0.0, 0.0],
+        [-0.5, -np.sqrt(3)/2, 0.0],
+        [0.5, -np.sqrt(3)/2, 0.0]
+    ])
 
-napthalene_coordinates = np.array([
-    [ 1.24593, 1.40391, -0.0000],
-    [0.00001, 0.71731, -0.00000],
-    [-0.00000, -0.71730, -0.00000],
-    [1.24592, -1.40388, -0.00000],
-    [2.43659, -0.70922, -0.00000],
-    [2.43659, 0.70921, 0.00000],
-    [-1.24593, -1.40387, 0.00000],
-    [-2.43660, -0.70921, 0.00000],
-    [-2.43660, 0.70921, 0.00000],
-    [-1.24592, 1.40390, -0.00000],
-])
+    napthalene_coordinates = np.array([
+        [ 1.24593, 1.40391, -0.0000],
+        [0.00001, 0.71731, -0.00000],
+        [-0.00000, -0.71730, -0.00000],
+        [1.24592, -1.40388, -0.00000],
+        [2.43659, -0.70922, -0.00000],
+        [2.43659, 0.70921, 0.00000],
+        [-1.24593, -1.40387, 0.00000],
+        [-2.43660, -0.70921, 0.00000],
+        [-2.43660, 0.70921, 0.00000],
+        [-1.24592, 1.40390, -0.00000],
+    ])
 
-# create instance for benzene
-molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha_initial, beta_initial, cutoff_distance)
-optimise_and_plot(molecular_system_benzene, target_eigenvalues_benzene, "Benzene", cutoff_distance)
+    # create instance for benzene
+    molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha_initial, beta_initial, benzene_cutoff_distance)
+    optimise_and_plot(molecular_system_benzene, target_eigenvalues_benzene, "Benzene", benzene_cutoff_distance)
 
-# create instance for napthalene
-#molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
-#optimise_and_plot(molecular_system_napthalene, target_eigenvalues_napthalene, "Naphthalene", cutoff_distance)
+    # create instance for napthalene
+    #molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha_initial, beta_initial, napthalene_cutoff_distance)
+    #optimise_and_plot(molecular_system_napthalene, target_eigenvalues_napthalene, "Naphthalene", napthalene_cutoff_distance)
 
 
 

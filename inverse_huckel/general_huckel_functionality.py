@@ -5,49 +5,25 @@ import torch
 from matplotlib import cm
 
 class MolecularSystem:
-    # def __init__(self, coordinates, alpha, beta, cutoff_distance): #original code
+
+    # def __init__(self, coordinates, alpha, beta, cutoff_distance):
     #     self.coordinates = coordinates
-    #     self.alpha = alpha
+    #     self.alpha = torch.tensor(alpha)
     #     self.beta = beta
     #     self.cutoff_distance = cutoff_distance
     #     self.H = self.construct_hamiltonian()
-
-
-    # def __init__(self, coordinates, alpha, beta, cutoff_distance): #derivative code that isn't correct
-    #     self.coordinates = coordinates
-    #     self.alpha = torch.tensor(alpha, requires_grad=True)
-    #     self.beta = beta
-    #     self.cutoff_distance = cutoff_distance
-    #     self.H = self.construct_hamiltonian().detach() #???
-
     def __init__(self, coordinates, alpha, beta, cutoff_distance):
         self.coordinates = coordinates
-        self.alpha = torch.tensor(alpha)
-        self.beta = beta
+        self.alpha = torch.tensor(alpha, requires_grad=True)  # Set requires_grad to True
+        self.beta = torch.tensor(beta, requires_grad=True)  # Set requires_grad to True
         self.cutoff_distance = cutoff_distance
         self.H = self.construct_hamiltonian()
 
-    # def calculate_distance(self, atom_i, atom_j): #original code
-    #     return np.linalg.norm(atom_i - atom_j)
-    
-    
     def calculate_distance(self, atom_i, atom_j):
         atom_i_tensor = torch.tensor(atom_i)
         atom_j_tensor = torch.tensor(atom_j)
         return torch.linalg.norm(atom_i_tensor - atom_j_tensor)
 
-    # def construct_hamiltonian(self): #original code
-    #     n = len(self.coordinates)
-    #     H = np.zeros((n, n))
-    #     for i in range(n):
-    #         for j in range(i + 1, n):
-    #             distance_ij = self.calculate_distance(self.coordinates[i], self.coordinates[j])
-    #             if distance_ij < self.cutoff_distance:
-    #                 H[i, j] = self.beta
-    #                 H[j, i] = self.beta
-    #     np.fill_diagonal(H, self.alpha)
-    #     return H
-    
     def construct_hamiltonian(self):
         n = len(self.coordinates)
         H = torch.zeros((n, n))  # create a new tensor for H
@@ -58,28 +34,16 @@ class MolecularSystem:
                     H[i, j] = self.beta
                     H[j, i] = self.beta
         H.fill_diagonal_(self.alpha.item())  # Fill diagonal with scalar value of alpha
-
         return H
+
+    def update_hamiltonian(self):
+        self.H = self.construct_hamiltonian()
 
     def solve_eigenvalue_problem(self):
         #print (self.H)
         #print (np.linalg.eigh(self.H))
         return np.linalg.eigh(self.H)
     
-    
-    
-    # def solve_eigenvalue_problem_pytorch(self): #original code
-    #     H = self.construct_hamiltonian()
-    #     H = torch.from_numpy(H)
-    #     # Perform eigenvalue decomposition using PyTorch
-    #     eigenvalues_complex, eigenvectors = torch.linalg.eig(H)
-    #     #eigenvalues_complex = torch.linalg.eigvals(H)
-                
-    #     # Extract the real part of eigenvalues
-    #     #eigenvalues_real = eigenvalues_complex.numpy()
-    #     eigenvalues_real = eigenvalues_complex.real
-    
-    #     return eigenvalues_real, eigenvectors
     
     def solve_eigenvalue_problem_pytorch(self):
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
@@ -101,7 +65,7 @@ class MolecularSystem:
             plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
         plt.xlabel('X / $\AA$')
         plt.ylabel('Y / $\AA$')
-        plt.title( f'Molecular Orbital {i+1} of {molecule_name}')
+        plt.title( f'Molecular Orbital {i+1} of {molecule_name} using NumPy')
         plt.axis('equal')
         plt.grid(True)
         file_name = f'Molecular Orbital {i+1} of {molecule_name}.pdf'
@@ -134,7 +98,7 @@ class MolecularSystem:
 
         plt.xlabel('X / $\AA$')
         plt.ylabel('Y / $\AA$')
-        plt.title(f'Molecular Orbital {i+1} of {molecule_name}')
+        plt.title(f'Molecular Orbital {i+1} of {molecule_name} using PyTorch')
         plt.axis('equal')
         plt.grid(True)
         file_name = f'Molecular Orbital {i+1} of {molecule_name}_pytorch.pdf'
@@ -173,9 +137,7 @@ class MolecularSystem:
 
         plt.show()
 
-
-    def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"):
-        eigenvalues, _ = energies  # Unpack the tuple, _ is a placeholder to ignore the second element of the tuple as it is not needed
+    def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # code to work for experiment 2
         eigenvalues = eigenvalues.clone().detach()
         print("eigenvalues", eigenvalues)
 
@@ -199,13 +161,45 @@ class MolecularSystem:
         plt.title(f'Energy Levels of {molecule_name} using PyTorch')
         
         # Define the file path and name based on the molecule name
-        # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels.pdf"
+        # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels_PyTorch.pdf"
         # file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
         
         # # Save the plot
         # plt.savefig(file_path)
 
         plt.show()
+    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): # previous code
+    #     eigenvalues, _ = energies  # Unpack the tuple, _ is a placeholder to ignore the second element of the tuple as it is not needed
+    #     eigenvalues = eigenvalues.clone().detach()
+    #     print("eigenvalues", eigenvalues)
+
+    #     prev_energy = None  # keeps track of the previous energy level
+    #     x_offset = 0  # determines the starting position of each energy level line on the plot
+    #     tolerance = 1e-6  # tolerance to determine if two energy levels are degenerate
+
+    #     for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
+    #         if prev_energy is not None and abs(energy - prev_energy) < tolerance:
+    #             x_offset += 0.3  # Increase the x offset to add whitespace for degenerate levels
+    #         else:
+    #             x_offset = 0  # Reset x offset for non-degenerate energy levels
+
+    #         plt.hlines(energy, xmin=x_offset, xmax=0.3 + x_offset, color='blue')  
+    #         prev_energy = energy  # Update the previous energy level
+    #         x_offset += 0.5  # Add spacing between consecutive energy levels
+
+    #     plt.margins(x=3)
+    #     plt.xlabel('Energy Levels') 
+    #     plt.ylabel('Energy (eV)')
+    #     plt.title(f'Energy Levels of {molecule_name} using PyTorch')
+        
+    #     # Define the file path and name based on the molecule name
+    #     # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels_PyTorch.pdf"
+    #     # file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+        
+    #     # # Save the plot
+    #     # plt.savefig(file_path)
+
+    #     plt.show()
 
 
     # def compute_gradient_with_respect_to_eigenvalues(self, target_eigenvalues): #derivative code that isn't correct

@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-
+# optimisation code applied to a 2x2 matrix to see if specific values in the matrix can be changed
 # Create a 2x2 matrix
 matrix = torch.tensor([[3.0, 1.0],
                        [2.0, 4.0]], requires_grad=True)
