@@ -47,6 +47,30 @@ class MolecularSystem:
         # Solve the eigenvalue problem for the Hamiltonian using PyTorch.
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         return eigenvalues, eigenvectors
+    
+    
+    def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # code to work for experiment 2
+        eigenvalues = eigenvalues.clone().detach()
+        print("eigenvalues", eigenvalues)
+
+        prev_energy = None  # keeps track of the previous energy level
+        x_offset = 0  # determines the starting position of each energy level line on the plot
+        tolerance = 1e-6  # tolerance to determine if two energy levels are degenerate
+
+        for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
+            if prev_energy is not None and abs(energy - prev_energy) < tolerance:
+                x_offset += 0.3  # Increase the x offset to add whitespace for degenerate levels
+            else:
+                x_offset = 0  # Reset x offset for non-degenerate energy levels
+
+            plt.hlines(energy, xmin=x_offset, xmax=0.3 + x_offset, color='blue')  
+            prev_energy = energy  # Update the previous energy level
+            x_offset += 0.5  # Add spacing between consecutive energy levels
+
+        plt.margins(x=3)
+        plt.xlabel('Energy Levels') 
+        plt.ylabel('Energy (eV)')
+        plt.title(f'Energy Levels of {molecule_name} using PyTorch')
 
 
 def optimise_molecular_system(molecular_system, target_eigenvalues, num_iterations=1000, learning_rate=0.1): # code works but may not be computing gradients correctly
@@ -73,7 +97,6 @@ def optimise_molecular_system(molecular_system, target_eigenvalues, num_iteratio
         
         if i % 500 == 0 or i == num_iterations:
             print(f"Iteration {i}, Loss: {loss.item()}")
-          
 
         if i < num_iterations:# Perform backpropagation to compute gradients if not the last iteration
             loss.backward() # performs backpropagation, which calculates the gradients of the loss function with respect to the model parameters (alpha and beta in this case).
