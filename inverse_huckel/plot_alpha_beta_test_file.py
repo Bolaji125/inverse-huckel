@@ -49,8 +49,8 @@ class MolecularSystem:
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         return eigenvalues, eigenvectors
     
-    def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # added from general huckel functionality for experiment 2
-        #eigenvalues, _ = energies  # Unpack the tuple, _ is a placeholder to ignore the second element of the tuple as it is not needed
+    
+    def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # code to work for experiment 2
         eigenvalues = eigenvalues.clone().detach()
         print("eigenvalues", eigenvalues)
 
@@ -72,17 +72,6 @@ class MolecularSystem:
         plt.xlabel('Energy Levels') 
         plt.ylabel('Energy (eV)')
         plt.title(f'Energy Levels of {molecule_name} using PyTorch')
-        
-        # Define the file path and name based on the molecule name
-        # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels_PyTorch.pdf"
-        # file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
-        
-        # # Save the plot
-        # plt.savefig(file_path)
-
-        plt.show()
-
-
 
 
 def optimise_molecular_system(molecular_system, target_eigenvalues, num_iterations=1000, learning_rate=0.1): # code works but may not be computing gradients correctly
@@ -109,7 +98,6 @@ def optimise_molecular_system(molecular_system, target_eigenvalues, num_iteratio
         
         if i % 500 == 0 or i == num_iterations:
             print(f"Iteration {i}, Loss: {loss.item()}")
-          
 
         if i < num_iterations:# Perform backpropagation to compute gradients if not the last iteration
             loss.backward() # performs backpropagation, which calculates the gradients of the loss function with respect to the model parameters (alpha and beta in this case).

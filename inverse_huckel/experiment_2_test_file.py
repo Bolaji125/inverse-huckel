@@ -5,13 +5,11 @@ import os
 import torch.nn.functional as F
 
 # Import necessary classes and functions from your plot and optimization script
-#from general_huckel_functionality import MolecularSystem
-from plot_alpha_beta_test_file import MolecularSystem, \
-    optimise_molecular_system, generate_atom_pairs, plot_parameter_changes, plot_molecule, optimise_and_plot
-#from plot_alpha_beta_test_file import optimise_molecular_system, plot_parameter_changes, plot_molecule, optimise_and_plot
+from plot_alpha_beta_test_file import MolecularSystem
+from plot_alpha_beta_test_file import optimise_molecular_system, plot_parameter_changes, plot_molecule, optimise_and_plot
 
 # Define the coordinates of naphthalene
-naphthalene_coordinates = [
+naphthalene_coordinates = np.array([
     [1.24593, 1.40391, -0.0000],
     [0.00001, 0.71731, -0.00000],
     [-0.00000, -0.71730, -0.00000],
@@ -22,7 +20,7 @@ naphthalene_coordinates = [
     [-2.43660, -0.70921, 0.00000],
     [-2.43660, 0.70921, 0.00000],
     [-1.24592, 1.40390, -0.00000],
-]
+])
 
 alpha_initial = -1.0
 beta_initial = -1.0
