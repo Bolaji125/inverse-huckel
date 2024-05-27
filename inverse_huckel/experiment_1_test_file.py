@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from plot_alpha_beta_test_file import MolecularSystem, \
     optimise_molecular_system, generate_atom_pairs, plot_parameter_changes, plot_molecule, optimise_and_plot
 
-alpha_initial = 0.0
+alpha_initial = -1.0
 beta_initial = -1.0
 cutoff_distance = 1.0  # Adjusted cutoff distance for the perfect hexagon
 
@@ -23,7 +23,7 @@ benzene_coordinates = np.array([
     [0.5, -np.sqrt(3)/2, 0.0]
 ])
 
-molecule_name ="benzene"
+molecule_name ="Benzene"
 
 # Create an instance for benzene
 molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha_initial, beta_initial, cutoff_distance)

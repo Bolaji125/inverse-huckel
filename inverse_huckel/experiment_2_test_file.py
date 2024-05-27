@@ -5,11 +5,13 @@ import os
 import torch.nn.functional as F
 
 # Import necessary classes and functions from your plot and optimization script
-from general_huckel_functionality import MolecularSystem
-from plot_alpha_beta_test_file import optimise_molecular_system, plot_parameter_changes, plot_molecule, optimise_and_plot
+#from general_huckel_functionality import MolecularSystem
+from plot_alpha_beta_test_file import MolecularSystem, \
+    optimise_molecular_system, generate_atom_pairs, plot_parameter_changes, plot_molecule, optimise_and_plot
+#from plot_alpha_beta_test_file import optimise_molecular_system, plot_parameter_changes, plot_molecule, optimise_and_plot
 
 # Define the coordinates of naphthalene
-napthalene_coordinates = [
+naphthalene_coordinates = [
     [1.24593, 1.40391, -0.0000],
     [0.00001, 0.71731, -0.00000],
     [-0.00000, -0.71730, -0.00000],
@@ -30,7 +32,9 @@ cutoff_distance = 1.5
 target_eigenvalues_naphthalene = torch.tensor([-4.3, -3.6, -3.3, -3, -2.5, -1.2, -1.0, 1.3, 1.6, 2.3], dtype=torch.float32, requires_grad=False)
 
 # Initialize the molecular system with naphthalene coordinates and initial alpha/beta values
-molecular_system_naphthalene = MolecularSystem(napthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
+molecular_system_naphthalene = MolecularSystem(naphthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
+
+
 
 # Solve the eigenvalue problem to get the energies
 #energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem()[0]

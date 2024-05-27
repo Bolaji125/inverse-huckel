@@ -6,18 +6,18 @@ from matplotlib import cm
 
 class MolecularSystem:
 
-    # def __init__(self, coordinates, alpha, beta, cutoff_distance):
-    #     self.coordinates = coordinates
-    #     self.alpha = torch.tensor(alpha)
-    #     self.beta = beta
-    #     self.cutoff_distance = cutoff_distance
-    #     self.H = self.construct_hamiltonian()
     def __init__(self, coordinates, alpha, beta, cutoff_distance):
         self.coordinates = coordinates
-        self.alpha = torch.tensor(alpha, requires_grad=True)  # Set requires_grad to True
-        self.beta = torch.tensor(beta, requires_grad=True)  # Set requires_grad to True
+        self.alpha = torch.tensor(alpha)
+        self.beta = beta
         self.cutoff_distance = cutoff_distance
         self.H = self.construct_hamiltonian()
+    # def __init__(self, coordinates, alpha, beta, cutoff_distance):
+    #     self.coordinates = coordinates
+    #     self.alpha = torch.tensor(alpha, requires_grad=True)  # Set requires_grad to True
+    #     self.beta = torch.tensor(beta, requires_grad=True)  # Set requires_grad to True
+    #     self.cutoff_distance = cutoff_distance
+    #     self.H = self.construct_hamiltonian()
 
     def calculate_distance(self, atom_i, atom_j):
         atom_i_tensor = torch.tensor(atom_i)
@@ -36,21 +36,25 @@ class MolecularSystem:
         H.fill_diagonal_(self.alpha.item())  # Fill diagonal with scalar value of alpha
         return H
 
-    def update_hamiltonian(self):
-        self.H = self.construct_hamiltonian()
+    # def update_hamiltonian(self):
+    #     self.H = self.construct_hamiltonian()
 
     def solve_eigenvalue_problem(self):
         #print (self.H)
         #print (np.linalg.eigh(self.H))
+        # H_numpy = self.H.detach().numpy()  # Detach the tensor before converting to NumPy array
+        # return np.linalg.eigh(H_numpy)
+
         return np.linalg.eigh(self.H)
     
     
     def solve_eigenvalue_problem_pytorch(self):
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         return eigenvalues, eigenvectors
+    
        
     
-    def plot_molecular_orbitals(self, coordinates,i, molecule_name = "Molecule"):
+    def plot_molecular_orbitals(self, coordinates,i, molecule_name = "Molecule"): # old code
         energies, wavefunctions = self.solve_eigenvalue_problem()
         #print("energy of MO ", i+1, ":", energies[i])
         #print(energies)
@@ -81,7 +85,8 @@ class MolecularSystem:
                 if distance <= threshold_distance:
                     plt.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], 'k-')
 
-    def plot_molecular_orbitals_pytorch(self, coordinates, i, molecule_name="Molecule"):
+   
+    def plot_molecular_orbitals_pytorch(self, coordinates, i, molecule_name="Molecule"): # old code
         energies, wavefunctions = self.solve_eigenvalue_problem_pytorch()
 
         fig = plt.figure()
@@ -137,6 +142,37 @@ class MolecularSystem:
 
         plt.show()
 
+    # def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # code to work for experiment 2
+    #     eigenvalues = eigenvalues.clone().detach()
+    #     print("eigenvalues", eigenvalues)
+
+    #     prev_energy = None  # keeps track of the previous energy level
+    #     x_offset = 0  # determines the starting position of each energy level line on the plot
+    #     tolerance = 1e-6  # tolerance to determine if two energy levels are degenerate
+
+    #     for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
+    #         if prev_energy is not None and abs(energy - prev_energy) < tolerance:
+    #             x_offset += 0.3  # Increase the x offset to add whitespace for degenerate levels
+    #         else:
+    #             x_offset = 0  # Reset x offset for non-degenerate energy levels
+
+    #         plt.hlines(energy, xmin=x_offset, xmax=0.3 + x_offset, color='blue')  
+    #         prev_energy = energy  # Update the previous energy level
+    #         x_offset += 0.5  # Add spacing between consecutive energy levels
+
+    #     plt.margins(x=3)
+    #     plt.xlabel('Energy Levels') 
+    #     plt.ylabel('Energy (eV)')
+    #     plt.title(f'Energy Levels of {molecule_name} using PyTorch')
+        
+    #     # Define the file path and name based on the molecule name
+    #     # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels_PyTorch.pdf"
+    #     # file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+        
+    #     # # Save the plot
+    #     # plt.savefig(file_path)
+
+    #     plt.show()
     def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # code to work for experiment 2
         eigenvalues = eigenvalues.clone().detach()
         print("eigenvalues", eigenvalues)
@@ -159,17 +195,11 @@ class MolecularSystem:
         plt.xlabel('Energy Levels') 
         plt.ylabel('Energy (eV)')
         plt.title(f'Energy Levels of {molecule_name} using PyTorch')
-        
-        # Define the file path and name based on the molecule name
-        # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels_PyTorch.pdf"
-        # file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
-        
-        # # Save the plot
-        # plt.savefig(file_path)
 
         plt.show()
-    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): # previous code
-    #     eigenvalues, _ = energies  # Unpack the tuple, _ is a placeholder to ignore the second element of the tuple as it is not needed
+        
+    # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): # previous code, 
+    #     #eigenvalues, _ = energies  # Unpack the tuple, _ is a placeholder to ignore the second element of the tuple as it is not needed
     #     eigenvalues = eigenvalues.clone().detach()
     #     print("eigenvalues", eigenvalues)
 
@@ -202,63 +232,9 @@ class MolecularSystem:
     #     plt.show()
 
 
-    # def compute_gradient_with_respect_to_eigenvalues(self, target_eigenvalues): #derivative code that isn't correct
-    #     eigenvalues, _ = self.solve_eigenvalue_problem_pytorch()
-    #     eigenvalues_tensor = torch.tensor(eigenvalues, requires_grad=True)  # Convert eigenvalues to a PyTorch tensor
-    #     print(eigenvalues.grad)
-    #     mse_loss = torch.nn.functional.mse_loss(eigenvalues_tensor, torch.tensor(target_eigenvalues))
-    #     mse_loss.backward()  # Compute gradient of MSE loss function
-    #     if eigenvalues_tensor.grad is not None:  # Check if gradients exist
-    #         return eigenvalues_tensor.grad
-    #     else:
-    #         raise RuntimeError("Gradient computation failed.")
-    
-
-    # def visualise_gradient(self, target_eigenvalues, molecule_name = "Molecule" ): #derivative code that isn't correct
-    #     eigenvalues_gradient = self.compute_gradient_with_respect_to_eigenvalues(target_eigenvalues) #line computes the gradient
-    #     print("eigenvalues gradient:", eigenvalues_gradient)
-    #     cmap = cm.coolwarm  # Define the colormap which colours the bars in the bar plot
-    #     plt.bar(np.arange(len(eigenvalues_gradient)), eigenvalues_gradient, color=cmap(eigenvalues_gradient))  # Use the colormap
-    #     plt.xticks(np.arange(len(eigenvalues_gradient)), np.arange(len(eigenvalues_gradient)))  # Adjust the x-axis ticks
-    #     plt.xlabel('Eigenvalue')
-    #     plt.ylabel('Gradient')
-    #     plt.title( f'Gradient of Hamiltonian {molecule_name} with Respect to Eigenvalues')
-    #     plt.show()
-    
-    def compute_derivative_matrix_with_respect_to_eigenvalues(self):
-        eigenvalues, eigenvectors = self.solve_eigenvalue_problem_pytorch()
-        print("eigenvalues:", eigenvalues)
-        n = len(eigenvalues)
-        D = torch.zeros(n, n, n, n)
-        for i in range(n):
-            for j in range(n):
-                #D[i, j] = eigenvectors[:, i] * eigenvectors[:, j].unsqueeze(0)
-                D[i, j] = eigenvectors[:, i].unsqueeze(1) @ eigenvectors[:, j].unsqueeze(0)
-        return D
-    
-    def visualise_matrices(self):
-        derivative_matrices = self.compute_derivative_matrix_with_respect_to_eigenvalues()
-        n = len(derivative_matrices) # calculates the size of derivative matrices list, which represent the number of derivative matrices
-
-        fig, axs = plt.subplots(n, n, figsize=(10, 10)) # creates a grid of subplots with dimensions n by n. it returns a figure and an array of axes. figsize sets the size of the figure 
-
-        for i in range(n): # this line iterates over the rows of the grid, i represents the rowns of the grid, n is the size of the grid(the no of rows or columsn)
-            for j in range(n): # this line iterates over the columns of the grid
-                axs[i, j].imshow(derivative_matrices[i, j], cmap='viridis') # displays the i, j-th matrix
-                axs[i, j].set_title(f'Derivative Matrix {i+1}, {j+1}', fontsize=8, pad=2) # line sets the title of the subplot at position i, j to indicate the index of the derivative matrix.
-
-        plt.tight_layout() # This line adjusts the spacing between subplots to make sure they fit nicely in the figure.
-        plt.show()
     
     
        
 
     
-# Define the directory where you want to save the file
-# directory = 'Documents/GitHub/inverse-huckel.git/inverse_huckel'
 
-# # Construct the full file path
-# file_path = os.path.join(os.path.expanduser('~'), directory)
-
-# # Print the file path
-# print("File path:", file_path)

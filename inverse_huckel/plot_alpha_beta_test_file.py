@@ -13,7 +13,8 @@ class MolecularSystem:
         self.beta_indices = []
         for i in range(len(coordinates)):
             for j in range(i + 1, len(coordinates)):
-                distance = np.linalg.norm(coordinates[i] - coordinates[j])
+                #distance = np.linalg.norm(coordinates[i] - coordinates[j])
+                distance = np.linalg.norm(np.array(coordinates[i]) - np.array(coordinates[j]))
                 if distance <= cutoff_distance:
                     self.beta_indices.append((i, j))
         print("Length of beta indices:", len(self.beta_indices)) 
@@ -47,6 +48,41 @@ class MolecularSystem:
         # Solve the eigenvalue problem for the Hamiltonian using PyTorch.
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         return eigenvalues, eigenvectors
+    
+    def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # added from general huckel functionality for experiment 2
+        #eigenvalues, _ = energies  # Unpack the tuple, _ is a placeholder to ignore the second element of the tuple as it is not needed
+        eigenvalues = eigenvalues.clone().detach()
+        print("eigenvalues", eigenvalues)
+
+        prev_energy = None  # keeps track of the previous energy level
+        x_offset = 0  # determines the starting position of each energy level line on the plot
+        tolerance = 1e-6  # tolerance to determine if two energy levels are degenerate
+
+        for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
+            if prev_energy is not None and abs(energy - prev_energy) < tolerance:
+                x_offset += 0.3  # Increase the x offset to add whitespace for degenerate levels
+            else:
+                x_offset = 0  # Reset x offset for non-degenerate energy levels
+
+            plt.hlines(energy, xmin=x_offset, xmax=0.3 + x_offset, color='blue')  
+            prev_energy = energy  # Update the previous energy level
+            x_offset += 0.5  # Add spacing between consecutive energy levels
+
+        plt.margins(x=3)
+        plt.xlabel('Energy Levels') 
+        plt.ylabel('Energy (eV)')
+        plt.title(f'Energy Levels of {molecule_name} using PyTorch')
+        
+        # Define the file path and name based on the molecule name
+        # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels_PyTorch.pdf"
+        # file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+        
+        # # Save the plot
+        # plt.savefig(file_path)
+
+        plt.show()
+
+
 
 
 def optimise_molecular_system(molecular_system, target_eigenvalues, num_iterations=1000, learning_rate=0.1): # code works but may not be computing gradients correctly
@@ -196,10 +232,10 @@ if __name__=="__main__":
     beta_initial = -1.0
     #cutoff_distance = 2.0
     benzene_cutoff_distance = 1.0
-    napthalene_cutoff_distance = 1.5
+    naphthalene_cutoff_distance = 1.5
 
     target_eigenvalues_benzene = torch.tensor([-13.0, -12.0, -12.0, -9.0, -10.0, -9.0], dtype=torch.float32, requires_grad=False)
-    target_eigenvalues_napthalene = torch.tensor([-13.0, -12.0, -11.5, -12.5, -11.0, -10.5, -10.0, -9.0, -9.5, -8.0], dtype=torch.float32, requires_grad=False)
+    target_eigenvalues_naphthalene = torch.tensor([-13.0, -12.0, -11.5, -12.5, -11.0, -10.5, -10.0, -9.0, -9.5, -8.0], dtype=torch.float32, requires_grad=False)
 
     # benzene_coordinates = np.array([
     #     [-4.461121, 1.187057, -0.028519],
@@ -218,7 +254,7 @@ if __name__=="__main__":
         [0.5, -np.sqrt(3)/2, 0.0]
     ])
 
-    napthalene_coordinates = np.array([
+    naphthalene_coordinates = np.array([
         [ 1.24593, 1.40391, -0.0000],
         [0.00001, 0.71731, -0.00000],
         [-0.00000, -0.71730, -0.00000],
@@ -234,10 +270,11 @@ if __name__=="__main__":
     # create instance for benzene
     molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha_initial, beta_initial, benzene_cutoff_distance)
     optimise_and_plot(molecular_system_benzene, target_eigenvalues_benzene, "Benzene", benzene_cutoff_distance)
+    # why is parameter changes not running?
 
-    # create instance for napthalene
-    #molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha_initial, beta_initial, napthalene_cutoff_distance)
-    #optimise_and_plot(molecular_system_napthalene, target_eigenvalues_napthalene, "Naphthalene", napthalene_cutoff_distance)
+    # create instance for naphthalene
+    #molecular_system_naphthalene = MolecularSystem(naphthalene_coordinates, alpha_initial, beta_initial, naphthalene_cutoff_distance)
+    #optimise_and_plot(molecular_system_naphthalene, target_eigenvalues_naphthalene, "Naphthalene", naphthalene_cutoff_distance)
 
 
 

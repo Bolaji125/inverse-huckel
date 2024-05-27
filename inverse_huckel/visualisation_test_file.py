@@ -131,7 +131,7 @@ beta_initial = -1.0
 cutoff_distance = 2.0
 
 target_eigenvalues_benzene = torch.tensor([-13.0, -12.0, -12.0, -9.0, -10.0, -9.0], dtype=torch.float32, requires_grad=False)
-target_eigenvalues_napthalene = torch.tensor([-13.0, -12.0, -11.5, -12.5, -11.0, -10.5, -10.0, -9.0, -9.5, -8.0], dtype=torch.float32, requires_grad=False)
+target_eigenvalues_naphthalene = torch.tensor([-13.0, -12.0, -11.5, -12.5, -11.0, -10.5, -10.0, -9.0, -9.5, -8.0], dtype=torch.float32, requires_grad=False)
 
 benzene_coordinates = np.array([
     [-4.461121, 1.187057, -0.028519],
@@ -142,7 +142,7 @@ benzene_coordinates = np.array([
     [-5.092743, -0.058655, -0.010193]
 ])
 
-napthalene_coordinates = np.array([
+naphthalene_coordinates = np.array([
     [ 1.24593, 1.40391, -0.0000],
     [0.00001, 0.71731, -0.00000],
     [-0.00000, -0.71730, -0.00000],
@@ -157,16 +157,16 @@ napthalene_coordinates = np.array([
 
 # create instance for each molecule
 molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha_initial, beta_initial, cutoff_distance)
-molecular_system_napthalene = MolecularSystem(napthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
+molecular_system_naphthalene = MolecularSystem(naphthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
 
 # optimise the molecular system
 alpha_history_benzene, beta_history_benzene, loss_history_benzene = optimise_molecular_system(molecular_system_benzene, target_eigenvalues_benzene)
-alpha_history_napthalene, beta_history_napthalene, loss_history_napthalene = optimise_molecular_system(molecular_system_napthalene, target_eigenvalues_napthalene)
+alpha_history_naphthalene, beta_history_naphthalene, loss_history_naphthalene = optimise_molecular_system(molecular_system_naphthalene, target_eigenvalues_naphthalene)
 
 # plot the changes
 plot_parameter_changes(alpha_history_benzene, beta_history_benzene, loss_history_benzene, "Benzene")
 
-plot_parameter_changes(alpha_history_napthalene, beta_history_napthalene, loss_history_napthalene, "Naphthalene")
+plot_parameter_changes(alpha_history_naphthalene, beta_history_naphthalene, loss_history_naphthalene, "Naphthalene")
 
 
 
