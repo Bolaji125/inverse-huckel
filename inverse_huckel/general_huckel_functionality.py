@@ -52,38 +52,86 @@ class MolecularSystem:
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         return eigenvalues, eigenvectors
     
-       
-    
-    def plot_molecular_orbitals(self, coordinates,i, molecule_name = "Molecule"): # old code
+    def plot_molecular_orbitals(self, coordinates, molecule_name="Molecule"):
         energies, wavefunctions = self.solve_eigenvalue_problem()
-        #print("energy of MO ", i+1, ":", energies[i])
-        #print(energies)
-        num_mos = len(wavefunctions[0]) #calculates the number of mos based on the length of the wavenfunctions array
-        fig = plt.figure()
-        # Draw lines for pairs of atoms with short distances
-        self.draw_short_distance_lines(coordinates) #calling the method below
+        num_mos = len(wavefunctions[0])  # Calculate the number of molecular orbitals
 
-        circle_sizes = np.abs(wavefunctions[:, i]) * 5000
-        colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
-        for j in range(len(coordinates)):
-            plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
-        plt.xlabel('X / $\AA$')
-        plt.ylabel('Y / $\AA$')
-        plt.title( f'Molecular Orbital {i+1} of {molecule_name} using NumPy')
-        plt.axis('equal')
-        plt.grid(True)
-        file_name = f'Molecular Orbital {i+1} of {molecule_name}.pdf'
-        file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
-        fig.savefig(file_path)
+        # Calculate the number of rows and columns for the subplot grid
+        num_cols = min(num_mos, 3)  # Maximum of 3 columns
+        num_rows = (num_mos + num_cols - 1) // num_cols
+
+        fig, axes = plt.subplots(num_rows, num_cols, figsize=(5*num_cols, 5*num_rows))
+
+        for i in range(num_mos):
+            row = i // num_cols
+            col = i % num_cols
+
+            circle_sizes = np.abs(wavefunctions[:, i]) * 5000
+            colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
+
+            for j in range(len(coordinates)):
+                axes[row, col].scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
+
+            # Draw lines for pairs of atoms with short distances
+            self.draw_short_distance_lines(coordinates, axes[row, col])
+
+            axes[row, col].set_xlabel('X / $\AA$')
+            axes[row, col].set_ylabel('Y / $\AA$')
+            axes[row, col].set_title(f'Molecular Orbital {i+1} of {molecule_name} using NumPy')
+            axes[row, col].axis('equal')
+            axes[row, col].grid(True)
+        plt.subplots_adjust(hspace=0.3, bottom=0.15, top=0.9)  # Adjust the vertical spacing between rows and bottom margin
+        plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust the layout to prevent overlap
+        plt.savefig(f'{molecule_name}_molecular_orbitals.png')
         plt.show()
 
-    def draw_short_distance_lines(self, coordinates):
-        threshold_distance = 2  # rough distance between each coordinate pair
+    def draw_short_distance_lines(self, coordinates, ax):
+        threshold_distance = 1  # rough distance between each coordinate pair
         for i in range(len(coordinates)):
             for j in range(i + 1, len(coordinates)):
                 distance = np.linalg.norm(coordinates[i] - coordinates[j])
                 if distance <= threshold_distance:
-                    plt.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], 'k-')
+                    ax.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], 'k-')
+
+
+
+
+    
+    # def plot_molecular_orbitals(self, coordinates,i, molecule_name = "Molecule"): # old code
+    #     energies, wavefunctions = self.solve_eigenvalue_problem()
+    #     #print("energy of MO ", i+1, ":", energies[i])
+    #     #print(energies)
+    #     num_mos = len(wavefunctions[0]) #calculates the number of mos based on the length of the wavenfunctions array
+    #     fig = plt.figure()
+    #     # Draw lines for pairs of atoms with short distances
+    #     self.draw_short_distance_lines(coordinates) #calling the method below
+
+    #     circle_sizes = np.abs(wavefunctions[:, i]) * 5000
+    #     colors = ['green' if val >= 0 else 'red' for val in wavefunctions[:, i]]
+    #     for j in range(len(coordinates)):
+    #         plt.scatter(coordinates[j, 0], coordinates[j, 1], s=circle_sizes[j], color=colors[j], alpha=0.5)
+    #     plt.xlabel('X / $\AA$')
+    #     plt.ylabel('Y / $\AA$')
+    #     plt.title( f'Molecular Orbital {i+1} of {molecule_name} using NumPy')
+    #     plt.axis('equal')
+    #     plt.grid(True)
+    #     file_name = f'Molecular Orbital {i+1} of {molecule_name}.png'
+    #     file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+    #     #fig.savefig(file_path)
+    #     plt.savefig(file_path)
+    #     plt.show()
+    #     plt.close(fig)  # Close the figure to free up memory
+
+   
+
+
+    # def draw_short_distance_lines(self, coordinates): # old code
+    #     threshold_distance = 2  # rough distance between each coordinate pair
+    #     for i in range(len(coordinates)):
+    #         for j in range(i + 1, len(coordinates)):
+    #             distance = np.linalg.norm(coordinates[i] - coordinates[j])
+    #             if distance <= threshold_distance:
+    #                 plt.plot([coordinates[i, 0], coordinates[j, 0]], [coordinates[i, 1], coordinates[j, 1]], 'k-')
 
    
     def plot_molecular_orbitals_pytorch(self, coordinates, i, molecule_name="Molecule"): # old code
@@ -106,9 +154,13 @@ class MolecularSystem:
         plt.title(f'Molecular Orbital {i+1} of {molecule_name} using PyTorch')
         plt.axis('equal')
         plt.grid(True)
-        file_name = f'Molecular Orbital {i+1} of {molecule_name}_pytorch.pdf'
+        
+        # save plot as PNG file
+        file_name = f'Molecular Orbital {i+1} of {molecule_name}_pytorch.png'
         file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
         plt.show()
+        plt.savefig(file_path)
+        plt.close(fig)  # Close the figure to free up memory
 
 
     def plot_energy_levels(self, energies, molecule_name="Molecule"): #isn't reproducable for pytorch because enrgies aren't ordered
