@@ -4,10 +4,9 @@ import torch
 import torch.nn.functional as F
 
 class MolecularSystem:
-    def __init__(self, coordinates, alpha, beta, cutoff_distance):
+    def __init__(self, coordinates, alpha, beta, cutoff_distance): # original code that works
         self.coordinates = torch.tensor(coordinates, dtype=torch.float32)
-        #self.alpha = torch.tensor([alpha] * len(coordinates), requires_grad=True)
-        self.alpha = torch.tensor(alpha, dtype=torch.float32, requires_grad=True) # changed for experiment 3
+        self.alpha = torch.tensor([alpha] * len(coordinates), requires_grad=True)
         self.cutoff_distance = cutoff_distance
 
         # Calculate the number of valid beta values needed
@@ -20,11 +19,31 @@ class MolecularSystem:
                     self.beta_indices.append((i, j))
         print("Length of beta indices:", len(self.beta_indices)) 
         
-        #self.beta = torch.tensor([beta] * len(self.beta_indices), requires_grad=True)
-        self.beta = torch.tensor(beta, dtype=torch.float32, requires_grad=True) #changed for experiment 3
+        self.beta = torch.tensor([beta] * len(self.beta_indices), requires_grad=True)
         print("Length of beta tensor:", len(self.beta))
         self.H = torch.zeros((len(coordinates), len(coordinates)), dtype=torch.float32)
         self.update_hamiltonian()  # calls update hamiltonian to initialize the matrix
+
+    # def __init__(self, coordinates, alpha, beta, cutoff_distance): # code works for experiment 3
+    #     self.coordinates = torch.tensor(coordinates, dtype=torch.float32)
+    #     #self.alpha = torch.tensor([alpha] * len(coordinates), requires_grad=True)
+    #     self.alpha = torch.tensor(alpha, dtype=torch.float32, requires_grad=True) # added for experiment 3
+    #     self.cutoff_distance = cutoff_distance
+
+    #     # Calculate the number of valid beta values needed
+    #     self.beta_indices = []
+    #     for i in range(len(coordinates)):
+    #         for j in range(i + 1, len(coordinates)):
+    #             #distance = np.linalg.norm(coordinates[i] - coordinates[j])
+    #             distance = np.linalg.norm(np.array(coordinates[i]) - np.array(coordinates[j]))
+    #             if distance <= cutoff_distance:
+    #                 self.beta_indices.append((i, j))
+    #     print("Length of beta indices:", len(self.beta_indices)) 
+        
+    #     #self.beta = torch.tensor([beta] * len(self.beta_indices), requires_grad=True)
+    #     self.beta = torch.tensor(beta, dtype=torch.float32, requires_grad=True) #added for experiment 3
+    #     self.H = torch.zeros((len(coordinates), len(coordinates)), dtype=torch.float32)
+    #     self.update_hamiltonian()  # calls update hamiltonian to initialize the matrix
 
 
     def calculate_distance(self, atom_i, atom_j): 
