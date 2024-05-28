@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
+import os
+
 
 from plot_alpha_beta_test_file import MolecularSystem, \
     optimise_molecular_system, generate_atom_pairs, plot_parameter_changes, plot_molecule, optimise_and_plot
@@ -33,10 +35,21 @@ alpha_history, beta_history, loss_history = optimise_molecular_system(molecular_
     # Plot before and after optimisation with updated scaling factors
 plot_molecule(molecular_system_benzene.coordinates, alpha_history[0], beta_history[0],
                   f"{molecule_name} - Before Optimisation", cutoff_distance, alpha_scale=500, beta_scale=15)
+plt.savefig("before_optimisation_experiment_1.png")
     
 plot_molecule(molecular_system_benzene.coordinates, alpha_history[-1], beta_history[-1],
                   f"{molecule_name} - After Optimisation", cutoff_distance, alpha_scale=500, beta_scale=15)
-    
+plt.savefig("after_optimisation_experiment_1.png")
+ 
 plot_parameter_changes(alpha_history, beta_history, loss_history, molecule_name, molecular_system_benzene.beta_indices)
+try:
+    # Save the figure
+    plt.savefig("parameter_changes_experiment_1.png")
+    print("Image saved successfully.")
+except Exception as e:
+    print("Error occurred while saving the image:", e)
+#plt.savefig("parameter_changes_experiment_1.png")
 
-plt.show()
+
+
+

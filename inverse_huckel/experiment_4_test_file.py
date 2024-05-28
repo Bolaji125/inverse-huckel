@@ -41,7 +41,13 @@ for lr in learning_rates:
     beta_histories.append(beta_history)
     loss_histories.append(loss_history)
 
+# # Plot parameter changes against the number of epochs for each learning rate
+# for i, lr in enumerate(learning_rates):
+#     plot_parameter_changes(alpha_histories[i], beta_histories[i], loss_histories[i], f"Benzene (LR={lr})", molecular_system_benzene.beta_indices)
+# plt.show()
 # Plot parameter changes against the number of epochs for each learning rate
 for i, lr in enumerate(learning_rates):
+    plt.figure()  # Create a new figure for each plot
     plot_parameter_changes(alpha_histories[i], beta_histories[i], loss_histories[i], f"Benzene (LR={lr})", molecular_system_benzene.beta_indices)
-plt.show()
+    plt.savefig(f"parameter_changes_LR_{lr}.png")  # Save the figure as a PNG file
+    plt.show()  # Display the figure

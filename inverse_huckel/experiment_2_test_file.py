@@ -51,9 +51,23 @@ print(f"The HOMO-LUMO gap is {lumo:.6f} - {homo:.6f} = {homo_lumo_gap:.6f}")
 molecular_system_naphthalene.plot_energy_levels_pytorch(energies_naphthalene, molecule_name="Naphthalene")
 
 alpha_history, beta_history, loss_history = optimise_molecular_system(molecular_system_naphthalene, target_eigenvalues_naphthalene)
+# Plot before and after optimisation with updated scaling factors
+plot_molecule(molecular_system_naphthalene.coordinates, alpha_history[0], beta_history[0],
+                  "Naphthalene - Before Optimisation", cutoff_distance, alpha_scale=500, beta_scale=15)
+plt.savefig("before_optimisation_experiment_2.png")
+    
+plot_molecule(molecular_system_naphthalene.coordinates, alpha_history[-1], beta_history[-1],
+                  "Naphthalene - After Optimisation", cutoff_distance, alpha_scale=500, beta_scale=15)
+plt.savefig("after_optimisation_experiment_2.png")
+ 
+#plot_parameter_changes(alpha_history, beta_history, loss_history, "Naphthalene", molecular_system_naphthalene.beta_indices)
+
+#plt.savefig("parameter_changes_experiment_2.png")
+   
+
 
 # Optimise alpha and beta parameters and plot the results
-optimise_and_plot(molecular_system_naphthalene, target_eigenvalues_naphthalene, "Naphthalene", cutoff_distance)
+#optimise_and_plot(molecular_system_naphthalene, target_eigenvalues_naphthalene, "Naphthalene", cutoff_distance)
 
 # Recalculate the HOMO-LUMO gap after optimisation
 optimised_energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()[0]
@@ -70,6 +84,7 @@ homo_lumo_gap_optimised = lumo_optimised - homo_optimised
 print(f"The optimised HOMO-LUMO gap is {lumo_optimised:.6f} - {homo_optimised:.6f} = {homo_lumo_gap_optimised:.6f}")
 
 plot_parameter_changes(alpha_history, beta_history, loss_history,"Naphthalene" , molecular_system_naphthalene.beta_indices)
+plt.savefig("parameter_changes_experiment_2.png")
 
 # why is this running twice? i think issue is with optimise and plot not handling alpha history beta histry and loss history
 

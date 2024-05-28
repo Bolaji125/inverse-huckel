@@ -39,14 +39,13 @@ molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha, beta, cut
 #print("benzene", energies_benzene)
 
 #obtain energy
-#energies_pytorch = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
-# new code for some reason
+
 #energies_pytorch, wavefunctions_pytorch = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
+#energies_pytorch, eigenvectors_pytorch = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
 
 
-
-# # plot molecular orbitals - pytorch
-molecular_system_benzene.plot_molecular_orbitals_pytorch(benzene_coordinates,"Benzene")
+## plot molecular orbitals - pytorch
+#molecular_system_benzene.plot_molecular_orbitals_pytorch(benzene_coordinates,"Benzene")
 
 # #plot energy levels - pytorch
 #molecular_system_benzene.plot_energy_levels_pytorch(energies_pytorch, "Benzene")
@@ -75,20 +74,21 @@ molecular_system_naphthalene = MolecularSystem(naphthalene_coordinates, alpha, b
 #molecular_system_naphthalene.plot_molecular_orbitals(naphthalene_coordinates,"Naphthalene")
 
 # obtain energy
-#energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem()[0]
-#print("energies naphthalene:", energies_naphthalene)
+energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem()[0]
+print("energies naphthalene:", energies_naphthalene)
 
 # plot energy levels
-#molecular_system_naphthalene.plot_energy_levels(energies_naphthalene, "Naphthalene")
+molecular_system_naphthalene.plot_energy_levels(energies_naphthalene, "Naphthalene")
 
 #obtain energy - pytorch
-#energies_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
-#energies_pytorch, eigenvectors_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
-#energies_pytorch, wavefunctions_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
+energies_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
+energies_pytorch, eigenvectors_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
+
 
 #plot molecular orbitals- pytorch
-molecular_system_naphthalene.plot_molecular_orbitals_pytorch(naphthalene_coordinates, "Naphthalene")
+#molecular_system_naphthalene.plot_molecular_orbitals_pytorch(naphthalene_coordinates, "Naphthalene")
 
 #plot energy levels-pytorch
-#molecular_system_naphthalene.plot_energy_levels_pytorch(energies_pytorch, "Naphthalene")
+molecular_system_naphthalene.plot_energy_levels_pytorch(energies_pytorch, "Naphthalene")
+print("pytorch energies", energies_pytorch)
 

@@ -246,8 +246,8 @@ class MolecularSystem:
         plt.ylabel('Energy (eV)')
         plt.title(f'Energy Levels of {molecule_name} using NumPy')
 
-         # Define the file path and name based on the molecule name
-        file_name = f"{molecule_name.replace(' ', '_')}_energy_levels.pdf"
+        # Define the file path and name based on the molecule name
+        file_name = f"{molecule_name.replace(' ', '_')}_energy_levels.png"
         file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
         
         # Save the plot
@@ -255,46 +255,19 @@ class MolecularSystem:
 
         plt.show()
 
-    # def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # code to work for experiment 2
-    #     eigenvalues = eigenvalues.clone().detach()
-    #     print("eigenvalues", eigenvalues)
+        plt.close()  # Close the figure to free up memory
 
-    #     prev_energy = None  # keeps track of the previous energy level
-    #     x_offset = 0  # determines the starting position of each energy level line on the plot
-    #     tolerance = 1e-6  # tolerance to determine if two energy levels are degenerate
 
-    #     for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
-    #         if prev_energy is not None and abs(energy - prev_energy) < tolerance:
-    #             x_offset += 0.3  # Increase the x offset to add whitespace for degenerate levels
-    #         else:
-    #             x_offset = 0  # Reset x offset for non-degenerate energy levels
-
-    #         plt.hlines(energy, xmin=x_offset, xmax=0.3 + x_offset, color='blue')  
-    #         prev_energy = energy  # Update the previous energy level
-    #         x_offset += 0.5  # Add spacing between consecutive energy levels
-
-    #     plt.margins(x=3)
-    #     plt.xlabel('Energy Levels') 
-    #     plt.ylabel('Energy (eV)')
-    #     plt.title(f'Energy Levels of {molecule_name} using PyTorch')
-        
-    #     # Define the file path and name based on the molecule name
-    #     # file_name = f"{molecule_name.replace(' ', '_')}_energy_levels_PyTorch.pdf"
-    #     # file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
-        
-    #     # # Save the plot
-    #     # plt.savefig(file_path)
-
-    #     plt.show()
-    def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # code to work for experiment 2
+    def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # png save code that doesn't pick up all degenerate energy levels
         eigenvalues = eigenvalues.clone().detach()
-        print("eigenvalues", eigenvalues)
+        print("original eigenvalues", eigenvalues)
 
         prev_energy = None  # keeps track of the previous energy level
         x_offset = 0  # determines the starting position of each energy level line on the plot
         tolerance = 1e-6  # tolerance to determine if two energy levels are degenerate
 
         for energy in eigenvalues.numpy():  # Convert eigenvalues to a NumPy array to iterate over the energy levels
+            print("current energy", energy)
             if prev_energy is not None and abs(energy - prev_energy) < tolerance:
                 x_offset += 0.3  # Increase the x offset to add whitespace for degenerate levels
             else:
@@ -303,13 +276,23 @@ class MolecularSystem:
             plt.hlines(energy, xmin=x_offset, xmax=0.3 + x_offset, color='blue')  
             prev_energy = energy  # Update the previous energy level
             x_offset += 0.5  # Add spacing between consecutive energy levels
+        print("final eigenvalues", eigenvalues)
 
         plt.margins(x=3)
         plt.xlabel('Energy Levels') 
         plt.ylabel('Energy (eV)')
         plt.title(f'Energy Levels of {molecule_name} using PyTorch')
 
+        # Define the file path and name based on the molecule name
+        file_name = f"{molecule_name.replace(' ', '_')}_energy_levels_pytorch.png"
+        file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+        
+        # Save the plot
+        plt.savefig(file_path)
         plt.show()
+        plt.close()  # Close the figure to free up memory
+
+       
         
     # def plot_energy_levels_pytorch(self, energies, molecule_name="Molecule"): # previous code, 
     #     #eigenvalues, _ = energies  # Unpack the tuple, _ is a placeholder to ignore the second element of the tuple as it is not needed
