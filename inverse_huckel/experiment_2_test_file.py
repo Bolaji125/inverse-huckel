@@ -29,13 +29,10 @@ cutoff_distance = 1.5
 # Target eigenvalues for optimisation
 target_eigenvalues_naphthalene = torch.tensor([-4.3, -3.6, -3.3, -3, -2.5, -1.2, -1.0, 1.3, 1.6, 2.3], dtype=torch.float32, requires_grad=False)
 
-# Initialize the molecular system with naphthalene coordinates and initial alpha/beta values
+# Initialise the molecular system with naphthalene coordinates and initial alpha/beta values
 molecular_system_naphthalene = MolecularSystem(naphthalene_coordinates, alpha_initial, beta_initial, cutoff_distance)
 
-
-
 # Solve the eigenvalue problem to get the energies
-#energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem()[0]
 energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()[0]
 
 # Convert energies to regular decimal numbers with fixed decimal places (6 in this case)
@@ -50,8 +47,10 @@ homo_lumo_gap = lumo - homo
 # Print the HOMO-LUMO gap
 print(f"The HOMO-LUMO gap is {lumo:.6f} - {homo:.6f} = {homo_lumo_gap:.6f}")
 
-# Plot the energy levels to visualize the HOMO-LUMO gap
+# Plot the energy levels to visualise the HOMO-LUMO gap
 molecular_system_naphthalene.plot_energy_levels_pytorch(energies_naphthalene, molecule_name="Naphthalene")
+
+alpha_history, beta_history, loss_history = optimise_molecular_system(molecular_system_naphthalene, target_eigenvalues_naphthalene)
 
 # Optimise alpha and beta parameters and plot the results
 optimise_and_plot(molecular_system_naphthalene, target_eigenvalues_naphthalene, "Naphthalene", cutoff_distance)
@@ -59,10 +58,21 @@ optimise_and_plot(molecular_system_naphthalene, target_eigenvalues_naphthalene, 
 # Recalculate the HOMO-LUMO gap after optimisation
 optimised_energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()[0]
 
-# Calculate the HOMO-LUMO gap for optimized energies
+# calling optimise molecular system
+#alpha_history, beta_history, loss_history = optimise_molecular_system(molecular_system_naphthalene, target_eigenvalues_naphthalene)
+
+# Calculate the HOMO-LUMO gap for optimised energies
 homo_optimised = optimised_energies_naphthalene[4]  # 5th element
 lumo_optimised = optimised_energies_naphthalene[5]  # 6th element
 homo_lumo_gap_optimised = lumo_optimised - homo_optimised
 
 # Print the optimised HOMO-LUMO gap
 print(f"The optimised HOMO-LUMO gap is {lumo_optimised:.6f} - {homo_optimised:.6f} = {homo_lumo_gap_optimised:.6f}")
+
+plot_parameter_changes(alpha_history, beta_history, loss_history,"Naphthalene" , molecular_system_naphthalene.beta_indices)
+
+# why is this running twice? i think issue is with optimise and plot not handling alpha history beta histry and loss history
+
+
+
+

@@ -6,7 +6,8 @@ import torch.nn.functional as F
 class MolecularSystem:
     def __init__(self, coordinates, alpha, beta, cutoff_distance):
         self.coordinates = torch.tensor(coordinates, dtype=torch.float32)
-        self.alpha = torch.tensor([alpha] * len(coordinates), requires_grad=True)
+        #self.alpha = torch.tensor([alpha] * len(coordinates), requires_grad=True)
+        self.alpha = torch.tensor(alpha, dtype=torch.float32, requires_grad=True) # changed for experiment 3
         self.cutoff_distance = cutoff_distance
 
         # Calculate the number of valid beta values needed
@@ -19,7 +20,8 @@ class MolecularSystem:
                     self.beta_indices.append((i, j))
         print("Length of beta indices:", len(self.beta_indices)) 
         
-        self.beta = torch.tensor([beta] * len(self.beta_indices), requires_grad=True)
+        #self.beta = torch.tensor([beta] * len(self.beta_indices), requires_grad=True)
+        self.beta = torch.tensor(beta, dtype=torch.float32, requires_grad=True) #changed for experiment 3
         print("Length of beta tensor:", len(self.beta))
         self.H = torch.zeros((len(coordinates), len(coordinates)), dtype=torch.float32)
         self.update_hamiltonian()  # calls update hamiltonian to initialize the matrix
@@ -212,6 +214,11 @@ def optimise_and_plot(molecular_system, target_eigenvalues, molecule_name, cutof
                   f"{molecule_name} - After Optimisation", cutoff_distance, alpha_scale=500, beta_scale=15)
     
     plt.show()
+
+    return np.array(alpha_history), np.array(beta_history), np.array(loss_history) # added so no error in experiment 2
+
+
+
 
 
 if __name__=="__main__":
