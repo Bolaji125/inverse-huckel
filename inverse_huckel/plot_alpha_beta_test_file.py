@@ -4,6 +4,25 @@ import torch
 import torch.nn.functional as F
 
 class MolecularSystem:
+    # def __init__(self, coordinates, alpha, beta, cutoff_distance, use_individual_params=False):
+    #     self.coordinates = torch.tensor(coordinates, dtype=torch.float32)
+    #     self.cutoff_distance = cutoff_distance
+    #     self.use_individual_params = use_individual_params
+
+    #     if use_individual_params:
+    #         self.alpha = torch.tensor(alpha, dtype=torch.float32, requires_grad=True)
+    #         self.beta = torch.tensor(beta, dtype=torch.float32, requires_grad=True)
+    #     else:
+    #         num_atoms = len(coordinates)
+    #         self.alpha = torch.tensor([alpha] * num_atoms, dtype=torch.float32, requires_grad=True)
+    #         self.beta_indices = generate_atom_pairs(coordinates, cutoff_distance)
+    #         self.beta = torch.tensor([beta] * len(self.beta_indices), dtype=torch.float32, requires_grad=True)
+        
+    #     self.H = torch.zeros((len(coordinates), len(coordinates)), dtype=torch.float32)
+    #     self.update_hamiltonian()
+
+
+
     def __init__(self, coordinates, alpha, beta, cutoff_distance): # original code that works
         self.coordinates = torch.tensor(coordinates, dtype=torch.float32)
         self.alpha = torch.tensor([alpha] * len(coordinates), requires_grad=True)
@@ -52,7 +71,7 @@ class MolecularSystem:
         atom_j_tensor = torch.tensor(atom_j)
         return torch.linalg.norm(atom_i_tensor - atom_j_tensor)
     
-    def update_hamiltonian(self):
+    def update_hamiltonian(self): # old code
         num_atoms = self.coordinates.shape[0]  # determines the number of atoms
         self.H = torch.zeros((num_atoms, num_atoms), dtype=torch.float32)  # initializes the Hamiltonian matrix H with zeros.
         
@@ -64,12 +83,33 @@ class MolecularSystem:
         for pair_idx, (i, j) in enumerate(self.beta_indices):
             self.H[i, j] = self.beta[pair_idx]
             self.H[j, i] = self.beta[pair_idx]
+    # def update_hamiltonian(self):
+    #     num_atoms = self.coordinates.shape[0]
+    #     self.H = torch.zeros((num_atoms, num_atoms), dtype=torch.float32)
+        
+    #     if self.use_individual_params:
+    #         for i in range(num_atoms):
+    #             self.H[i, i] = self.alpha[i]
+        
+    #         for pair_idx, (i, j) in enumerate(self.beta_indices):
+    #             self.H[i, j] = self.beta[pair_idx]
+    #             self.H[j, i] = self.beta[pair_idx]
+    #     else:
+    #         # Convert scalar alpha to a 1D tensor with the same value repeated
+    #         self.alpha = torch.tensor([self.alpha] * num_atoms, dtype=torch.float32)
+            
+    #         for i in range(num_atoms):
+    #             self.H[i, i] = self.alpha[i]
+            
+    #         for pair_idx, (i, j) in enumerate(generate_atom_pairs(self.coordinates, self.cutoff_distance)):
+    #             self.H[i, j] = self.beta[pair_idx]
+    #             self.H[j, i] = self.beta[pair_idx]
+
 
     def solve_eigenvalue_problem_pytorch(self):
         # Solve the eigenvalue problem for the Hamiltonian using PyTorch.
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         return eigenvalues, eigenvectors
-    
     
     def plot_energy_levels_pytorch(self, eigenvalues, molecule_name="Molecule"): # code to work for experiment 2
         eigenvalues = eigenvalues.clone().detach()
@@ -283,8 +323,9 @@ if __name__=="__main__":
 
     # create instance for benzene
     molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha_initial, beta_initial, benzene_cutoff_distance)
-    optimise_and_plot(molecular_system_benzene, target_eigenvalues_benzene, "Benzene", benzene_cutoff_distance)
-    # why is parameter changes not running?
+    alpha_history, beta_history, loss_history = optimise_and_plot(molecular_system_benzene, target_eigenvalues_benzene, "Benzene", benzene_cutoff_distance)
+    plot_parameter_changes(alpha_history, beta_history, loss_history, "Benzene", molecular_system_benzene.beta_indices)
+    
 
     # create instance for naphthalene
     #molecular_system_naphthalene = MolecularSystem(naphthalene_coordinates, alpha_initial, beta_initial, naphthalene_cutoff_distance)

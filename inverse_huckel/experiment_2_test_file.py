@@ -24,7 +24,7 @@ naphthalene_coordinates = np.array([
 
 alpha_initial = -1.0
 beta_initial = -1.0
-cutoff_distance = 1.5
+cutoff_distance = 2.0
 
 # Target eigenvalues for optimisation
 target_eigenvalues_naphthalene = torch.tensor([-4.3, -3.6, -3.3, -3, -2.5, -1.2, -1.0, 1.3, 1.6, 2.3], dtype=torch.float32, requires_grad=False)
@@ -60,20 +60,9 @@ plot_molecule(molecular_system_naphthalene.coordinates, alpha_history[-1], beta_
                   "Naphthalene - After Optimisation", cutoff_distance, alpha_scale=500, beta_scale=15)
 plt.savefig("after_optimisation_experiment_2.png")
  
-#plot_parameter_changes(alpha_history, beta_history, loss_history, "Naphthalene", molecular_system_naphthalene.beta_indices)
-
-#plt.savefig("parameter_changes_experiment_2.png")
-   
-
-
-# Optimise alpha and beta parameters and plot the results
-#optimise_and_plot(molecular_system_naphthalene, target_eigenvalues_naphthalene, "Naphthalene", cutoff_distance)
 
 # Recalculate the HOMO-LUMO gap after optimisation
 optimised_energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()[0]
-
-# calling optimise molecular system
-#alpha_history, beta_history, loss_history = optimise_molecular_system(molecular_system_naphthalene, target_eigenvalues_naphthalene)
 
 # Calculate the HOMO-LUMO gap for optimised energies
 homo_optimised = optimised_energies_naphthalene[4]  # 5th element
@@ -86,7 +75,6 @@ print(f"The optimised HOMO-LUMO gap is {lumo_optimised:.6f} - {homo_optimised:.6
 plot_parameter_changes(alpha_history, beta_history, loss_history,"Naphthalene" , molecular_system_naphthalene.beta_indices)
 plt.savefig("parameter_changes_experiment_2.png")
 
-# why is this running twice? i think issue is with optimise and plot not handling alpha history beta histry and loss history
 
 
 

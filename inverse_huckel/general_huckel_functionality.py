@@ -36,20 +36,16 @@ class MolecularSystem:
         H.fill_diagonal_(self.alpha.item())  # Fill diagonal with scalar value of alpha
         return H
 
-    # def update_hamiltonian(self):
-    #     self.H = self.construct_hamiltonian()
-
     def solve_eigenvalue_problem(self):
-        #print (self.H)
-        #print (np.linalg.eigh(self.H))
-        # H_numpy = self.H.detach().numpy()  # Detach the tensor before converting to NumPy array
-        # return np.linalg.eigh(H_numpy)
+        print ("hamiltonian", self.H)
+        print (np.linalg.eigh(self.H))
 
         return np.linalg.eigh(self.H)
     
     
     def solve_eigenvalue_problem_pytorch(self):
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
+        print (eigenvalues,eigenvectors)
         return eigenvalues, eigenvectors
     
     def plot_molecular_orbitals(self, coordinates, molecule_name="Molecule"):

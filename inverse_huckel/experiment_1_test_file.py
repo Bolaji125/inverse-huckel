@@ -10,7 +10,7 @@ from plot_alpha_beta_test_file import MolecularSystem, \
 
 alpha_initial = -1.0
 beta_initial = -1.0
-cutoff_distance = 1.0  # Adjusted cutoff distance for the perfect hexagon
+cutoff_distance = 2.0  # Adjusted cutoff distance for the perfect hexagon
 
 # Target eigenvalues for benzene
 target_eigenvalues_benzene = torch.tensor([-2.0, -0.5, -0.5, 0.5, 0.5, 2.0], dtype=torch.float32, requires_grad=False)
@@ -23,6 +23,14 @@ benzene_coordinates = np.array([
     [-1.0, 0.0, 0.0],
     [-0.5, -np.sqrt(3)/2, 0.0],
     [0.5, -np.sqrt(3)/2, 0.0]
+])
+benzene_coordinates = np.array([ # scaled benzene coordinates
+    [ 1.3965    ,  0.        ,  0.        ],
+    [ 0.69825   ,  1.2095694 ,  0.        ],
+    [-0.69825   ,  1.2095694 ,  0.        ],
+    [-1.3965    ,  0.        ,  0.        ],
+    [-0.69825   , -1.2095694 ,  0.        ],
+    [ 0.69825   , -1.2095694 ,  0.        ]
 ])
 
 molecule_name ="Benzene"
