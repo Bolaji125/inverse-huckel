@@ -37,7 +37,7 @@ benzene_coordinates = np.array([ # scaled benzene coordinates
 ])
  #benzene
  # create molecular system instance
-molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha, beta, cutoff_distance)
+#molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha, beta, cutoff_distance)
 
 #plot molecular orbitals
 #molecular_system_benzene.plot_molecular_orbitals(benzene_coordinates, "Benzene")
@@ -77,24 +77,24 @@ naphthalene_coordinates = np.array([
 molecular_system_naphthalene = MolecularSystem(naphthalene_coordinates, alpha, beta, cutoff_distance)
 
 # plot molecular orbitals
-#molecular_system_naphthalene.plot_molecular_orbitals(naphthalene_coordinates,"Naphthalene")
+molecular_system_naphthalene.plot_molecular_orbitals(naphthalene_coordinates,"Naphthalene")
 
 # obtain energy
-energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem()[0]
+#energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem()[0]
 #print("energies naphthalene:", energies_naphthalene)
 
 # plot energy levels
-molecular_system_naphthalene.plot_energy_levels(energies_naphthalene, "Naphthalene")
+#molecular_system_naphthalene.plot_energy_levels(energies_naphthalene, "Naphthalene")
 
 #obtain energy - pytorch
 #energies_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
-energies_pytorch, eigenvectors_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
+#energies_pytorch, eigenvectors_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
 
 
 #plot molecular orbitals- pytorch
-#molecular_system_naphthalene.plot_molecular_orbitals_pytorch(naphthalene_coordinates, "Naphthalene")
+molecular_system_naphthalene.plot_molecular_orbitals_pytorch(naphthalene_coordinates, "Naphthalene")
 
 #plot energy levels-pytorch
-molecular_system_naphthalene.plot_energy_levels_pytorch(energies_pytorch, "Naphthalene")
+#molecular_system_naphthalene.plot_energy_levels_pytorch(energies_pytorch, "Naphthalene")
 #print("pytorch energies", energies_pytorch)
 

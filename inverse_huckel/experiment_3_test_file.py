@@ -62,4 +62,4 @@ for (alpha, beta) in zip(random_alphas, random_betas):
                 "Benzene - After Optimisation", cutoff_distance)
     plt.savefig("after_optimisation_experiment_3.png")
 
-    plt.show()
+   

@@ -56,9 +56,9 @@ class MolecularSystem:
         num_cols = min(num_mos, 3)  # Maximum of 3 columns
         num_rows = (num_mos + num_cols - 1) // num_cols
 
-        fig, axes = plt.subplots(num_rows, num_cols, figsize=(5 * num_cols, 5 * num_rows))
+        fig, axes = plt.subplots(num_rows, num_cols, figsize=(7 * num_cols, 7 * num_rows))
 
-        max_circle_size = 2500 * np.max(np.abs(wavefunctions))
+        max_circle_size = 5000 * np.max(np.abs(wavefunctions))
         margin = max_circle_size ** 0.5 / 2  # Calculate the margin to fit the largest circle
 
         min_x, max_x = np.min(coordinates[:, 0]) - margin, np.max(coordinates[:, 0]) + margin

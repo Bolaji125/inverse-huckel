@@ -16,14 +16,14 @@ cutoff_distance = 2.0  # Adjusted cutoff distance for the perfect hexagon
 target_eigenvalues_benzene = torch.tensor([-2.0, -0.5, -0.5, 0.5, 0.5, 2.0], dtype=torch.float32, requires_grad=False)
 
 # Coordinates for benzene (perfect hexagon)
-benzene_coordinates = np.array([
-    [1.0, 0.0, 0.0],
-    [0.5, np.sqrt(3)/2, 0.0],
-    [-0.5, np.sqrt(3)/2, 0.0],
-    [-1.0, 0.0, 0.0],
-    [-0.5, -np.sqrt(3)/2, 0.0],
-    [0.5, -np.sqrt(3)/2, 0.0]
-])
+# benzene_coordinates = np.array([
+#     [1.0, 0.0, 0.0],
+#     [0.5, np.sqrt(3)/2, 0.0],
+#     [-0.5, np.sqrt(3)/2, 0.0],
+#     [-1.0, 0.0, 0.0],
+#     [-0.5, -np.sqrt(3)/2, 0.0],
+#     [0.5, -np.sqrt(3)/2, 0.0]
+# ])
 benzene_coordinates = np.array([ # scaled benzene coordinates
     [ 1.3965    ,  0.        ,  0.        ],
     [ 0.69825   ,  1.2095694 ,  0.        ],
@@ -50,12 +50,6 @@ plot_molecule(molecular_system_benzene.coordinates, alpha_history[-1], beta_hist
 plt.savefig("after_optimisation_experiment_1.png")
  
 plot_parameter_changes(alpha_history, beta_history, loss_history, molecule_name, molecular_system_benzene.beta_indices)
-try:
-    # Save the figure
-    plt.savefig("parameter_changes_experiment_1.png")
-    print("Image saved successfully.")
-except Exception as e:
-    print("Error occurred while saving the image:", e)
 #plt.savefig("parameter_changes_experiment_1.png")
 
 

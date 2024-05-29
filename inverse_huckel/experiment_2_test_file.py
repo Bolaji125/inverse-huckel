@@ -73,7 +73,7 @@ homo_lumo_gap_optimised = lumo_optimised - homo_optimised
 print(f"The optimised HOMO-LUMO gap is {lumo_optimised:.6f} - {homo_optimised:.6f} = {homo_lumo_gap_optimised:.6f}")
 
 plot_parameter_changes(alpha_history, beta_history, loss_history,"Naphthalene" , molecular_system_naphthalene.beta_indices)
-plt.savefig("parameter_changes_experiment_2.png")
+#plt.savefig("parameter_changes_experiment_2.png")
 
 
 
