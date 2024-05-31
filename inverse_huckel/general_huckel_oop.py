@@ -5,27 +5,9 @@ from general_huckel_functionality import MolecularSystem
 import torch
 import torch.linalg as linalg
 
-alpha = -10.0
+alpha = -10
 beta = -1.0
 cutoff_distance = 2.0 
-
-# benzene_coordinates = np.array([
-#     [-4.461121, 1.187057, -0.028519],
-#     [-3.066650, 1.263428, -0.002700],
-#     [-2.303848, 0.094131, 0.041626],
-#     [-2.935547, -1.151550, 0.059845],
-#     [-4.330048, -1.227982, 0.034073],
-#     [-5.092743, -0.058655, -0.010193]
-# ])
-
-# benzene_coordinates = np.array([
-#     [1.0, 0.0, 0.0],
-#     [0.5, np.sqrt(3)/2, 0.0],
-#     [-0.5, np.sqrt(3)/2, 0.0],
-#     [-1.0, 0.0, 0.0],
-#     [-0.5, -np.sqrt(3)/2, 0.0],
-#     [0.5, -np.sqrt(3)/2, 0.0]
-# ])
 
 benzene_coordinates = np.array([ # scaled benzene coordinates
     [ 1.3965    ,  0.        ,  0.        ],
@@ -37,25 +19,23 @@ benzene_coordinates = np.array([ # scaled benzene coordinates
 ])
  #benzene
  # create molecular system instance
-#molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha, beta, cutoff_distance)
+molecular_system_benzene = MolecularSystem(benzene_coordinates, alpha, beta, cutoff_distance)
 
 #plot molecular orbitals
-#molecular_system_benzene.plot_molecular_orbitals(benzene_coordinates, "Benzene")
+#molecular_system_benzene.plot_molecular_orbitals(benzene_coordinates,"Benzene")
 
 # plot energy levels
 #energies_benzene = molecular_system_benzene.solve_eigenvalue_problem()[0]  # obtaining the energy, [0] is used to access the first element of the tuple which corresponds to the eigenvalues
 #molecular_system_benzene.plot_energy_levels(energies_benzene, "Benzene")
-#print("benzene", energies_benzene)
 
 #obtain energy- pytorch
-#energies_pytorch, eigenvectors_pytorch = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
+energies_pytorch, eigenvectors_pytorch = molecular_system_benzene.solve_eigenvalue_problem_pytorch()
 
 ## plot molecular orbitals - pytorch
-#molecular_system_benzene.plot_molecular_orbitals_pytorch(benzene_coordinates,"Benzene")
+molecular_system_benzene.plot_molecular_orbitals_pytorch(benzene_coordinates,"Benzene")
 
 # #plot energy levels - pytorch
-#molecular_system_benzene.plot_energy_levels_pytorch(energies_pytorch, "Benzene")
-#print("benzene energies", energies_pytorch)
+molecular_system_benzene.plot_energy_levels_pytorch(energies_pytorch, "Benzene")
 
 
 #naphthalene
@@ -77,7 +57,7 @@ naphthalene_coordinates = np.array([
 molecular_system_naphthalene = MolecularSystem(naphthalene_coordinates, alpha, beta, cutoff_distance)
 
 # plot molecular orbitals
-molecular_system_naphthalene.plot_molecular_orbitals(naphthalene_coordinates,"Naphthalene")
+#molecular_system_naphthalene.plot_molecular_orbitals(naphthalene_coordinates,"Naphthalene")
 
 # obtain energy
 #energies_naphthalene = molecular_system_naphthalene.solve_eigenvalue_problem()[0]
@@ -87,14 +67,12 @@ molecular_system_naphthalene.plot_molecular_orbitals(naphthalene_coordinates,"Na
 #molecular_system_naphthalene.plot_energy_levels(energies_naphthalene, "Naphthalene")
 
 #obtain energy - pytorch
-#energies_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
-#energies_pytorch, eigenvectors_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
-
+energies_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
+energies_pytorch, eigenvectors_pytorch = molecular_system_naphthalene.solve_eigenvalue_problem_pytorch()
 
 #plot molecular orbitals- pytorch
-molecular_system_naphthalene.plot_molecular_orbitals_pytorch(naphthalene_coordinates, "Naphthalene")
+molecular_system_naphthalene.plot_molecular_orbitals_pytorch(naphthalene_coordinates,"Naphthalene")
 
 #plot energy levels-pytorch
-#molecular_system_naphthalene.plot_energy_levels_pytorch(energies_pytorch, "Naphthalene")
-#print("pytorch energies", energies_pytorch)
+molecular_system_naphthalene.plot_energy_levels_pytorch(energies_pytorch, "Naphthalene")
 

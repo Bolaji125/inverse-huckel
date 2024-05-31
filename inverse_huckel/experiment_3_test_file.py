@@ -52,14 +52,14 @@ for (alpha, beta) in zip(random_alphas, random_betas):
 
     # Plot parameter changes
     plot_parameter_changes(alpha_history, beta_history, loss_history, "Benzene", molecular_system_benzene.beta_indices)
-    plt.savefig("parameter_changes_experiment_3.png")
+    #plt.savefig("parameter_changes_experiment_3.png")
 
     # Plot molecule before and after optimisation
     plot_molecule(molecular_system_benzene.coordinates, alpha_history[0], beta_history[0],
                 "Benzene - Before Optimisation", cutoff_distance)
-    plt.savefig("before_optimisation_experiment_3.png")
+    #plt.savefig("before_optimisation_experiment_3.png")
     plot_molecule(molecular_system_benzene.coordinates, alpha_history[-1], beta_history[-1],
                 "Benzene - After Optimisation", cutoff_distance)
-    plt.savefig("after_optimisation_experiment_3.png")
+    #plt.savefig("after_optimisation_experiment_3.png")
 
    

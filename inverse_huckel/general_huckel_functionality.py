@@ -42,7 +42,6 @@ class MolecularSystem:
 
         return np.linalg.eigh(self.H)
     
-    
     def solve_eigenvalue_problem_pytorch(self):
         eigenvalues, eigenvectors = torch.linalg.eigh(self.H)
         print (eigenvalues,eigenvectors)
@@ -125,12 +124,12 @@ class MolecularSystem:
     #     plt.title( f'Molecular Orbital {i+1} of {molecule_name} using NumPy')
     #     plt.axis('equal')
     #     plt.grid(True)
-    #     file_name = f'Molecular Orbital {i+1} of {molecule_name}.png'
-    #     file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+    #     #file_name = f'Molecular Orbital {i+1} of {molecule_name}.png'
+    #     #file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
     #     #fig.savefig(file_path)
-    #     plt.savefig(file_path)
+    #     #plt.savefig(file_path)
     #     plt.show()
-    #     plt.close(fig)  # Close the figure to free up memory
+    #     #plt.close(fig)  # Close the figure to free up memory
 
 
     # def draw_short_distance_lines(self, coordinates): # old code
@@ -213,11 +212,11 @@ class MolecularSystem:
     #     plt.grid(True)
         
     #     # save plot as PNG file
-    #     file_name = f'Molecular Orbital {i+1} of {molecule_name}_pytorch.png'
-    #     file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
+    #     #file_name = f'Molecular Orbital {i+1} of {molecule_name}_pytorch.png'
+    #     #file_path = os.path.join("C:\\Users\\ogunn\\Documents\\GitHub\\inverse-huckel.git\\inverse_huckel", file_name)
     #     plt.show()
-    #     plt.savefig(file_path)
-    #     plt.close(fig)  # Close the figure to free up memory
+    #     #plt.savefig(file_path)
+    #     #plt.close(fig)  # Close the figure to free up memory
 
 
     def plot_energy_levels(self, energies, molecule_name="Molecule"): #isn't reproducable for pytorch because enrgies aren't ordered
